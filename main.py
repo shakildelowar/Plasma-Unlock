@@ -1,0 +1,260 @@
+#!/usr/bin/env python3
+"""
+XPL Wallet Unlock Tracker
+=========================
+Tracks large XPL wallets that had their first unlocks in January 2026,
+determines which are selling, and how much they have left to sell.
+
+"Large" is defined quantitatively using configurable statistical methods
+(MAD, z-score, IQR, percentile, log-normal z-score).
+
+Usage
+-----
+    # Discovery mode — scan blocks to find unlock recipients automatically
+    python main.py --discover --min-value 50000
+
+    # Scan known vesting contracts
+    python main.py --contracts 0xABC...,0xDEF...
+
+    # Track a pre-built wallet list
+    python main.py --wallets-file wallets.txt
+
+    # Tune classification sensitivity
+    python main.py --discover --method zscore --threshold 1.5
+
+    # Save results to JSON
+    python main.py --discover --output results.json
+"""
+
+import argparse
+import json
+import sys
+from collections import defaultdict
+
+import config
+from fetcher import PlasmaFetcher
+from classifier import classify_wallets
+from tracker import track_selling, generate_report
+
+
+def parse_args():
+    p = argparse.ArgumentParser(
+        description="Track large XPL wallet unlocks and selling behavior.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__,
+    )
+
+    # Date range
+    p.add_argument("--start-date", default=config.UNLOCK_START,
+                   help="Start of unlock window (YYYY-MM-DD)")
+    p.add_argument("--end-date", default=config.UNLOCK_END,
+                   help="End of unlock window (YYYY-MM-DD)")
+
+    # Data source
+    src = p.add_mutually_exclusive_group()
+    src.add_argument("--contracts", type=str, default="",
+                     help="Comma-separated vesting contract addresses")
+    src.add_argument("--discover", action="store_true",
+                     help="Auto-discover distributors by scanning blocks")
+    src.add_argument("--wallets-file", type=str, default="",
+                     help="File with wallet addresses to track (one per line)")
+
+    # Scan parameters
+    p.add_argument("--min-value", type=float, default=10_000,
+                   help="Min XPL per tx to consider an unlock (default: 10000)")
+    p.add_argument("--scan-days", type=int, default=0,
+                   help="If >0, narrow scan to ±N days around the 25th")
+    p.add_argument("--top-n", type=int, default=10,
+                   help="Top N distributors to show in discovery mode")
+
+    # Classification
+    p.add_argument("--method", default=config.DEFAULT_METHOD,
+                   choices=["zscore", "mad", "iqr", "percentile", "log_zscore"],
+                   help="Statistical method for 'large' classification")
+    p.add_argument("--threshold", type=float, default=config.DEFAULT_THRESHOLD,
+                   help="Method-specific threshold")
+
+    # Network
+    p.add_argument("--rpc-url", type=str, default="",
+                   help="Override Plasma RPC endpoint")
+
+    # Output
+    p.add_argument("--output", type=str, default="",
+                   help="Save results to JSON file")
+    p.add_argument("--verbose", "-v", action="store_true",
+                   help="Verbose output")
+
+    return p.parse_args()
+
+
+def _progress(i, total):
+    pct = i / total * 100 if total else 0
+    bar_len = 30
+    filled = int(bar_len * i / total) if total else 0
+    bar = "#" * filled + "-" * (bar_len - filled)
+    print(f"\r  [{bar}] {pct:5.1f}%  ({i:,}/{total:,} blocks)", end="", flush=True)
+    if i >= total:
+        print()
+
+
+def main():
+    args = parse_args()
+
+    # ── Connect ─────────────────────────────────────────────
+    rpc = args.rpc_url or None
+    print("Connecting to Plasma RPC...")
+    try:
+        fetcher = PlasmaFetcher(rpc_url=rpc)
+        latest = fetcher.latest_block()
+        print(f"  Connected.  Chain ID {config.CHAIN_ID}  |  Latest block: {latest:,}")
+    except Exception as e:
+        print(f"  ERROR: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    # ── Resolve block range ─────────────────────────────────
+    print(f"\nResolving blocks for {args.start_date} to {args.end_date} ...")
+    start_block = fetcher.date_to_block(args.start_date)
+    end_block = fetcher.date_to_block(args.end_date)
+
+    # Optional: narrow scan window around the 25th
+    if args.scan_days > 0:
+        # The monthly ecosystem unlock is ~25th of each month
+        mid_date = args.start_date[:8] + "25"
+        mid_block = fetcher.date_to_block(mid_date)
+        # Estimate blocks per day from recent chain data
+        ts1 = fetcher.block_timestamp(max(0, mid_block - 1000))
+        ts2 = fetcher.block_timestamp(mid_block)
+        secs_per_block = max((ts2 - ts1) / 1000, 0.5)
+        blocks_per_day = int(86400 / secs_per_block)
+        start_block = max(start_block, mid_block - args.scan_days * blocks_per_day)
+        end_block = min(end_block, mid_block + args.scan_days * blocks_per_day)
+        print(f"  Narrowed to ±{args.scan_days} days around the 25th")
+
+    n_blocks = end_block - start_block + 1
+    print(f"  Block range: {start_block:,} — {end_block:,}  ({n_blocks:,} blocks)")
+
+    # ── Collect wallet data ─────────────────────────────────
+    wallet_amounts = defaultdict(float)
+    all_txs = []
+
+    if args.wallets_file:
+        # --- Mode: pre-built wallet list ---
+        print(f"\nLoading wallets from {args.wallets_file} ...")
+        with open(args.wallets_file) as f:
+            addrs = [line.strip().lower() for line in f if line.strip()
+                     and not line.startswith("#")]
+        print(f"  Loaded {len(addrs)} addresses. Fetching balances...")
+        balances = fetcher.get_balances(addrs)
+        for addr, bal in balances.items():
+            if bal is not None:
+                wallet_amounts[addr] = bal
+        print(f"  {len(wallet_amounts)} wallets with valid balances.")
+
+    elif args.contracts or config.VESTING_CONTRACTS:
+        # --- Mode: known vesting contracts ---
+        contracts = (
+            [a.strip() for a in args.contracts.split(",") if a.strip()]
+            if args.contracts
+            else config.VESTING_CONTRACTS
+        )
+        print(f"\nScanning {len(contracts)} vesting contract(s) via API...")
+        for contract in contracts:
+            short = f"{contract[:8]}...{contract[-4:]}"
+            print(f"  Fetching txs from {short} ...")
+            txs = fetcher.get_normal_txs(contract, start_block, end_block)
+            count = 0
+            for tx in txs:
+                val_xpl = int(tx.get("value", "0")) / 10 ** config.XPL_DECIMALS
+                to_addr = tx.get("to", "").lower()
+                if val_xpl >= args.min_value and to_addr:
+                    wallet_amounts[to_addr] += val_xpl
+                    all_txs.append(tx)
+                    count += 1
+            print(f"    {count} qualifying transfers found")
+
+    else:
+        # --- Mode: discovery (default fallback) ---
+        print(f"\nDiscovery mode: scanning {n_blocks:,} blocks for "
+              f"transfers >= {args.min_value:,.0f} XPL ...")
+        if n_blocks > 500_000:
+            print("  NOTE: Large block range. Consider using --scan-days "
+                  "to narrow the window.")
+
+        txs = fetcher.scan_blocks(
+            start_block, end_block,
+            min_value_xpl=args.min_value,
+            progress_cb=_progress,
+        )
+        print(f"  Found {len(txs):,} transactions >= {args.min_value:,.0f} XPL")
+        all_txs.extend(txs)
+
+        for tx in txs:
+            if tx["to"]:
+                wallet_amounts[tx["to"]] += tx["value_xpl"]
+
+        # Show top distributors
+        sender_totals = defaultdict(float)
+        for tx in txs:
+            sender_totals[tx["from"]] += tx["value_xpl"]
+        top_senders = sorted(sender_totals.items(), key=lambda x: -x[1])[:args.top_n]
+        if top_senders:
+            print(f"\n  Top {len(top_senders)} distributors "
+                  f"(likely vesting/treasury contracts):")
+            for addr, total in top_senders:
+                short = f"{addr[:6]}...{addr[-4:]}"
+                print(f"    {short}  {total:>18,.2f} XPL sent")
+
+    if not wallet_amounts:
+        print("\nNo qualifying unlock transactions found.")
+        print("  Suggestions:")
+        print("    - Lower --min-value")
+        print("    - Provide known --contracts addresses")
+        print("    - Check --start-date / --end-date range")
+        print("    - Use --discover to scan blocks directly")
+        sys.exit(0)
+
+    print(f"\n{len(wallet_amounts):,} unique recipient wallets found.")
+
+    # ── Classify ────────────────────────────────────────────
+    print(f"\nClassifying wallets  (method={args.method}, "
+          f"threshold={args.threshold}) ...")
+    wallets_df, stats = classify_wallets(
+        dict(wallet_amounts),
+        method=args.method,
+        threshold=args.threshold,
+    )
+    print(f"  Cutoff: {stats['cutoff_xpl']:,.2f} XPL")
+    print(f"  Large:  {stats['n_large']} / {stats['n_total']} wallets")
+
+    if stats["n_large"] == 0:
+        print("\nNo wallets classified as 'large'. Try lowering --threshold.")
+        sys.exit(0)
+
+    # ── Track selling ───────────────────────────────────────
+    print(f"\nFetching current balances for {stats['n_large']} large wallets...")
+    tracking_df = track_selling(fetcher, wallets_df)
+
+    # ── Report ──────────────────────────────────────────────
+    report = generate_report(tracking_df, stats)
+    print(f"\n{report}")
+
+    # ── Save JSON ───────────────────────────────────────────
+    if args.output:
+        payload = {
+            "config": {
+                "start_date": args.start_date,
+                "end_date": args.end_date,
+                "method": args.method,
+                "threshold": args.threshold,
+                "min_value_xpl": args.min_value,
+            },
+            "stats": stats,
+            "large_wallets": tracking_df.to_dict(orient="records"),
+        }
+        with open(args.output, "w") as f:
+            json.dump(payload, f, indent=2, default=str)
+        print(f"\nResults saved to {args.output}")
+
+
+if __name__ == "__main__":
+    main()
