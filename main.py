@@ -27,6 +27,9 @@ Usage
 
     # Offline demo with synthetic data (no RPC/API needed)
     python main.py --sample
+
+    # Generate HTML dashboard and Excel report
+    python main.py --sample --dashboard --excel
 """
 
 import argparse
@@ -39,6 +42,8 @@ from fetcher import PlasmaFetcher
 from classifier import classify_wallets
 from tracker import track_selling, generate_report
 from sample_data import generate_sample_wallets, generate_sample_balances
+from dashboard import generate_dashboard
+from export_excel import export_excel
 
 
 def parse_args():
@@ -87,6 +92,14 @@ def parse_args():
     # Output
     p.add_argument("--output", type=str, default="",
                    help="Save results to JSON file")
+    p.add_argument("--dashboard", action="store_true",
+                   help="Generate interactive HTML dashboard")
+    p.add_argument("--dashboard-file", type=str, default="xpl_dashboard.html",
+                   help="Dashboard output path (default: xpl_dashboard.html)")
+    p.add_argument("--excel", action="store_true",
+                   help="Generate Excel (.xlsx) report")
+    p.add_argument("--excel-file", type=str, default="xpl_unlock_report.xlsx",
+                   help="Excel output path (default: xpl_unlock_report.xlsx)")
     p.add_argument("--verbose", "-v", action="store_true",
                    help="Verbose output")
 
@@ -162,22 +175,44 @@ def _run_sample(args):
     report = generate_report(tracking_df, stats)
     print(f"\n{report}")
 
-    # Save
+    run_config = {
+        "start_date": args.start_date,
+        "end_date": args.end_date,
+        "method": args.method,
+        "threshold": args.threshold,
+        "mode": "sample",
+    }
+
+    # Save JSON
     if args.output:
         payload = {
-            "config": {
-                "start_date": args.start_date,
-                "end_date": args.end_date,
-                "method": args.method,
-                "threshold": args.threshold,
-                "mode": "sample",
-            },
+            "config": run_config,
             "stats": stats,
             "large_wallets": tracking_df.to_dict(orient="records"),
         }
         with open(args.output, "w") as f:
             json.dump(payload, f, indent=2, default=str)
         print(f"\nResults saved to {args.output}")
+
+    # Dashboard
+    if args.dashboard:
+        path = generate_dashboard(
+            tracking_df, stats,
+            all_wallets_df=wallets_df,
+            output_path=args.dashboard_file,
+            run_config=run_config,
+        )
+        print(f"\nDashboard saved to {path}")
+
+    # Excel
+    if args.excel:
+        path = export_excel(
+            tracking_df, stats,
+            all_wallets_df=wallets_df,
+            output_path=args.excel_file,
+            run_config=run_config,
+        )
+        print(f"\nExcel report saved to {path}")
 
 
 def main():
@@ -326,22 +361,44 @@ def main():
     report = generate_report(tracking_df, stats)
     print(f"\n{report}")
 
+    run_config = {
+        "start_date": args.start_date,
+        "end_date": args.end_date,
+        "method": args.method,
+        "threshold": args.threshold,
+        "min_value_xpl": args.min_value,
+    }
+
     # ── Save JSON ───────────────────────────────────────────
     if args.output:
         payload = {
-            "config": {
-                "start_date": args.start_date,
-                "end_date": args.end_date,
-                "method": args.method,
-                "threshold": args.threshold,
-                "min_value_xpl": args.min_value,
-            },
+            "config": run_config,
             "stats": stats,
             "large_wallets": tracking_df.to_dict(orient="records"),
         }
         with open(args.output, "w") as f:
             json.dump(payload, f, indent=2, default=str)
         print(f"\nResults saved to {args.output}")
+
+    # ── Dashboard ───────────────────────────────────────────
+    if args.dashboard:
+        path = generate_dashboard(
+            tracking_df, stats,
+            all_wallets_df=wallets_df,
+            output_path=args.dashboard_file,
+            run_config=run_config,
+        )
+        print(f"\nDashboard saved to {path}")
+
+    # ── Excel ───────────────────────────────────────────────
+    if args.excel:
+        path = export_excel(
+            tracking_df, stats,
+            all_wallets_df=wallets_df,
+            output_path=args.excel_file,
+            run_config=run_config,
+        )
+        print(f"\nExcel report saved to {path}")
 
 
 if __name__ == "__main__":
