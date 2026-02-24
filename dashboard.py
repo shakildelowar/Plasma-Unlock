@@ -71,6 +71,18 @@ def generate_dashboard(
     # Top 20 for charts
     top_wallets = wallet_rows[:20]
 
+    # Replace NaN/None with JSON-safe null values
+    def _sanitize(val):
+        if val is None:
+            return None
+        if isinstance(val, float) and (val != val):  # NaN check
+            return None
+        return val
+
+    for w in wallet_rows:
+        for k, v in w.items():
+            w[k] = _sanitize(v)
+
     js_data = json.dumps({
         "wallets": wallet_rows,
         "top_wallets": top_wallets,
@@ -84,7 +96,7 @@ def generate_dashboard(
         "behavior_counts": behavior_counts,
         "config": run_config or {},
         "generated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
-    }, indent=2)
+    }, indent=2, default=str)
 
     rpc_url = config.RPC_URL
     plasmascan_url = config.PLASMASCAN_API_URL
@@ -117,139 +129,253 @@ _TEMPLATE = r"""<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #0f172a; --surface: #1e293b; --surface2: #334155;
-    --text: #f1f5f9; --muted: #94a3b8; --accent: #38bdf8;
-    --green: #34d399; --red: #f87171; --amber: #fbbf24; --blue: #60a5fa;
-    --purple: #a78bfa;
+    --bg: #f0f2f8;
+    --surface: rgba(255, 255, 255, 0.55);
+    --surface-solid: #ffffff;
+    --border: rgba(255, 255, 255, 0.6);
+    --border-outer: rgba(99, 102, 241, 0.1);
+    --text: #1e1b4b;
+    --text-secondary: #4338ca;
+    --muted: #6b7280;
+    --accent: #6366f1;
+    --accent2: #8b5cf6;
+    --blue: #3b82f6;
+    --indigo: #6366f1;
+    --violet: #8b5cf6;
+    --green: #10b981;
+    --red: #ef4444;
+    --amber: #f59e0b;
+    --purple: #8b5cf6;
+    --blur: 24px;
+    --radius: 20px;
+    --shadow: 0 8px 32px rgba(99, 102, 241, 0.08);
+    --shadow-lg: 0 16px 48px rgba(99, 102, 241, 0.12);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: var(--bg); color: var(--text); line-height: 1.5;
-    padding: 0 20px 40px;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg); color: var(--text); line-height: 1.6;
+    padding: 0 24px 48px;
+    min-height: 100vh;
+    background-image:
+      radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 0%, rgba(139, 92, 246, 0.10) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(59, 130, 246, 0.06) 0%, transparent 50%);
+    background-attachment: fixed;
   }
-  .header {
-    text-align: center; padding: 32px 0 24px;
-    border-bottom: 1px solid var(--surface2); margin-bottom: 24px;
-  }
-  .header h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-  .header h1 span { color: var(--accent); }
-  .header .meta { color: var(--muted); font-size: 13px; margin-top: 6px; }
+  .container { max-width: 1400px; margin: 0 auto; }
 
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
-  .kpi {
-    background: var(--surface); border-radius: 12px; padding: 20px;
-    border: 1px solid var(--surface2); text-align: center;
+  .header {
+    text-align: center; padding: 40px 0 28px;
+    margin-bottom: 28px;
   }
-  .kpi .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-  .kpi .value { font-size: 26px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
-  .kpi .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .header h1 {
+    font-size: 32px; font-weight: 800; letter-spacing: -0.5px;
+    background: linear-gradient(135deg, var(--indigo), var(--violet), var(--blue));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .header .meta {
+    color: var(--muted); font-size: 13px; margin-top: 8px;
+    font-weight: 500;
+  }
+  .header .meta strong { color: var(--text-secondary); }
+
+  /* Glass card base */
+  .glass {
+    background: var(--surface);
+    backdrop-filter: blur(var(--blur));
+    -webkit-backdrop-filter: blur(var(--blur));
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+  }
+  .glass:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .kpi {
+    padding: 22px; text-align: center;
+  }
+  .kpi .label {
+    font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+    color: var(--muted); font-weight: 600;
+  }
+  .kpi .value {
+    font-size: 28px; font-weight: 800; margin-top: 6px;
+    font-variant-numeric: tabular-nums;
+  }
+  .kpi .sub { font-size: 11px; color: var(--muted); margin-top: 4px; font-weight: 500; }
   .kpi.green .value { color: var(--green); }
   .kpi.red .value { color: var(--red); }
-  .kpi.blue .value { color: var(--accent); }
+  .kpi.blue .value {
+    background: linear-gradient(135deg, var(--indigo), var(--blue));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
   .kpi.amber .value { color: var(--amber); }
-  .kpi.purple .value { color: var(--purple); }
+  .kpi.purple .value {
+    background: linear-gradient(135deg, var(--violet), var(--indigo));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
 
   .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
   @media (max-width: 900px) { .charts { grid-template-columns: 1fr; } }
-  .chart-card {
-    background: var(--surface); border-radius: 12px; padding: 20px;
-    border: 1px solid var(--surface2);
+  .chart-card { padding: 24px; }
+  .chart-card h3 {
+    font-size: 12px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 18px; font-weight: 700;
   }
-  .chart-card h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
   .chart-wrap { position: relative; width: 100%; }
 
   .table-section {
-    background: var(--surface); border-radius: 12px; padding: 20px;
-    border: 1px solid var(--surface2); margin-bottom: 28px; overflow-x: auto;
+    padding: 24px; margin-bottom: 28px; overflow-x: auto;
   }
-  .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
-  .table-header h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .table-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 18px; flex-wrap: wrap; gap: 12px;
+  }
+  .table-header h3 {
+    font-size: 12px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.8px; font-weight: 700;
+  }
   .search-box {
-    background: var(--surface2); border: 1px solid #475569; border-radius: 8px;
-    padding: 8px 14px; color: var(--text); font-size: 13px; width: 300px;
-    outline: none; transition: border-color 0.2s;
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 12px;
+    padding: 10px 16px; color: var(--text); font-size: 13px; width: 320px;
+    outline: none; transition: all 0.3s ease; font-weight: 500;
   }
-  .search-box:focus { border-color: var(--accent); }
+  .search-box::placeholder { color: #a5a5b8; }
+  .search-box:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+  }
 
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
   th {
-    text-align: left; padding: 8px 10px; font-weight: 600; color: var(--muted);
-    border-bottom: 2px solid var(--surface2); cursor: pointer; white-space: nowrap;
-    user-select: none; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+    text-align: left; padding: 10px 12px; font-weight: 700; color: var(--muted);
+    border-bottom: 2px solid rgba(99, 102, 241, 0.1); cursor: pointer;
+    white-space: nowrap; user-select: none; font-size: 10px;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    background: rgba(248, 248, 255, 0.5);
   }
+  th:first-child { border-radius: 10px 0 0 0; }
+  th:last-child { border-radius: 0 10px 0 0; }
   th:hover { color: var(--accent); }
-  th .arrow { font-size: 9px; margin-left: 3px; }
+  th .arrow { font-size: 9px; margin-left: 3px; color: var(--accent); }
   td {
-    padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.06);
     white-space: nowrap;
   }
-  tr:hover td { background: rgba(56, 189, 248, 0.04); }
-  .mono { font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; }
-  .addr { font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; color: var(--accent); }
-  .num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'Consolas', monospace; font-size: 11px; }
+  tr:hover td { background: rgba(99, 102, 241, 0.04); }
+  .mono { font-family: 'SF Mono', 'Consolas', 'Monaco', monospace; font-size: 11px; }
+  .addr-link {
+    font-family: 'SF Mono', 'Consolas', 'Monaco', monospace; font-size: 11px;
+    color: var(--accent); text-decoration: none; font-weight: 600;
+    transition: color 0.2s;
+  }
+  .addr-link:hover { color: var(--violet); text-decoration: underline; }
+  .num {
+    text-align: right; font-variant-numeric: tabular-nums;
+    font-family: 'SF Mono', 'Consolas', monospace; font-size: 11px;
+  }
   .dim { color: var(--muted); font-size: 11px; }
   .badge {
-    display: inline-block; padding: 2px 8px; border-radius: 9999px;
-    font-size: 10px; font-weight: 600; text-transform: capitalize;
+    display: inline-block; padding: 3px 10px; border-radius: 9999px;
+    font-size: 10px; font-weight: 700; text-transform: capitalize;
+    letter-spacing: 0.3px;
   }
-  .badge.heavy_seller { background: rgba(248,113,113,0.2); color: var(--red); }
-  .badge.moderate_seller { background: rgba(251,191,36,0.2); color: var(--amber); }
-  .badge.light_seller { background: rgba(96,165,250,0.2); color: var(--blue); }
-  .badge.holder { background: rgba(52,211,153,0.2); color: var(--green); }
+  .badge.heavy_seller { background: rgba(239, 68, 68, 0.1); color: var(--red); }
+  .badge.moderate_seller { background: rgba(245, 158, 11, 0.12); color: var(--amber); }
+  .badge.light_seller { background: rgba(59, 130, 246, 0.1); color: var(--blue); }
+  .badge.holder { background: rgba(16, 185, 129, 0.1); color: var(--green); }
 
-  .sold-bar { width: 80px; height: 6px; background: var(--surface2); border-radius: 3px; display: inline-block; vertical-align: middle; }
+  .sold-bar {
+    width: 80px; height: 6px; background: rgba(99, 102, 241, 0.08);
+    border-radius: 3px; display: inline-block; vertical-align: middle;
+    overflow: hidden;
+  }
   .sold-bar-fill { height: 100%; border-radius: 3px; }
 
-  .lbl { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 600; background: rgba(167,139,250,0.15); color: var(--purple); margin-left: 4px; }
-
-  .sources {
-    background: var(--surface); border-radius: 12px; padding: 20px;
-    border: 1px solid var(--surface2);
+  .lbl {
+    display: inline-block; padding: 2px 8px; border-radius: 6px;
+    font-size: 9px; font-weight: 700;
+    background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1));
+    color: var(--violet); margin-left: 4px;
   }
-  .sources h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
-  .source-item { display: flex; gap: 16px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
-  .source-item:last-child { border: none; }
-  .source-name { font-weight: 600; min-width: 140px; color: var(--accent); font-size: 13px; }
-  .source-url { font-family: monospace; font-size: 11px; color: var(--muted); word-break: break-all; }
-  .source-desc { font-size: 12px; color: var(--text); }
 
-  .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 32px; }
+  .sources { padding: 24px; }
+  .sources h3 {
+    font-size: 12px; color: var(--muted); text-transform: uppercase;
+    letter-spacing: 0.8px; margin-bottom: 14px; font-weight: 700;
+  }
+  .source-item {
+    display: flex; gap: 16px; padding: 12px 0;
+    border-bottom: 1px solid rgba(99, 102, 241, 0.06);
+  }
+  .source-item:last-child { border: none; }
+  .source-name {
+    font-weight: 700; min-width: 150px; font-size: 13px;
+    background: linear-gradient(135deg, var(--indigo), var(--violet));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .source-url {
+    font-family: 'SF Mono', monospace; font-size: 11px; color: var(--muted);
+    word-break: break-all;
+  }
+  .source-desc { font-size: 12px; color: var(--text); line-height: 1.5; }
+
+  .footer {
+    text-align: center; color: var(--muted); font-size: 12px; margin-top: 36px;
+    font-weight: 500;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar { height: 6px; width: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.4); }
 </style>
 </head>
 <body>
 
+<div class="container">
+
 <div class="header">
-  <h1><span>XPL</span> Wallet Unlock Dashboard</h1>
+  <h1>XPL Wallet Unlock Dashboard</h1>
   <div class="meta" id="meta"></div>
 </div>
 
 <div class="kpis" id="kpis"></div>
 
 <div class="charts">
-  <div class="chart-card">
+  <div class="chart-card glass">
     <h3>Selling Behavior Distribution</h3>
     <div class="chart-wrap"><canvas id="behaviorChart"></canvas></div>
   </div>
-  <div class="chart-card">
+  <div class="chart-card glass">
     <h3>Top Wallets - Amount Received (XPL)</h3>
     <div class="chart-wrap"><canvas id="topWalletsChart"></canvas></div>
   </div>
-  <div class="chart-card">
+  <div class="chart-card glass">
     <h3>Sell Velocity - XPL Sold Per Day</h3>
     <div class="chart-wrap"><canvas id="velocityChart"></canvas></div>
   </div>
-  <div class="chart-card">
+  <div class="chart-card glass">
     <h3>Time to First Sell (Hours After Unlock)</h3>
     <div class="chart-wrap"><canvas id="timeToSellChart"></canvas></div>
   </div>
-  <div class="chart-card" style="grid-column: 1 / -1;">
+  <div class="chart-card glass" style="grid-column: 1 / -1;">
     <h3>Sold vs Remaining - Large Wallets</h3>
     <div class="chart-wrap"><canvas id="soldRemainingChart"></canvas></div>
   </div>
 </div>
 
-<div class="table-section">
+<div class="table-section glass">
   <div class="table-header">
     <h3>Large Wallet Details - Full Breakdown with Timing</h3>
     <input type="text" class="search-box" id="searchBox" placeholder="Search address, behavior, label, or source...">
@@ -260,35 +386,40 @@ _TEMPLATE = r"""<!DOCTYPE html>
   </table>
 </div>
 
-<div class="sources">
+<div class="sources glass">
   <h3>Data Sources & Methodology</h3>
   <div id="sourcesList"></div>
 </div>
 
 <div class="footer" id="footer"></div>
 
+</div>
+
 <script>
 /* __DATA__ */
 
-const fmt = (n) => n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const PLASMASCAN_BASE = '__PLASMASCAN_URL__'.replace('/api', '');
+
+const fmt = (n) => n != null ? n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2}) : '0.00';
 const fmtK = (n) => {
+  if (n == null || isNaN(n)) return '0';
   if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
   if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
   return n.toFixed(0);
 };
 const fmtDate = (d) => d ? d.replace(' UTC','') : '-';
-const fmtVel = (v) => v > 0 ? fmtK(v) + '/day' : '-';
 
 const BEHAVIOR_COLORS = {
-  heavy_seller: '#f87171', moderate_seller: '#fbbf24',
-  light_seller: '#60a5fa', holder: '#34d399',
+  heavy_seller: '#ef4444', moderate_seller: '#f59e0b',
+  light_seller: '#3b82f6', holder: '#10b981',
 };
+const CHART_PALETTE = ['#6366f1','#8b5cf6','#3b82f6','#a78bfa','#818cf8','#7c3aed','#6d28d9','#4f46e5','#4338ca','#2563eb'];
 
 // ── Meta ──
 document.getElementById('meta').innerHTML =
-  `Generated: ${DATA.generated} &nbsp;|&nbsp; ` +
-  `Method: <strong>${DATA.stats.method || 'N/A'}</strong> &nbsp;|&nbsp; ` +
-  `Threshold: <strong>${DATA.stats.threshold || 'N/A'}</strong> &nbsp;|&nbsp; ` +
+  `Generated: ${DATA.generated} &nbsp;&middot;&nbsp; ` +
+  `Method: <strong>${DATA.stats.method || 'N/A'}</strong> &nbsp;&middot;&nbsp; ` +
+  `Threshold: <strong>${DATA.stats.threshold || 'N/A'}</strong> &nbsp;&middot;&nbsp; ` +
   `Cutoff: <strong>${fmt(DATA.stats.cutoff_xpl || 0)} XPL</strong>`;
 
 // ── KPIs ──
@@ -306,24 +437,29 @@ const kpis = [
   { label: 'Total Sell Txs', value: totalSellTxs.toLocaleString(), sub: `avg ${Math.round(avgDaysSelling)} days active`, cls: 'purple' },
 ];
 kpis.forEach(k => {
-  kpiDiv.innerHTML += `<div class="kpi ${k.cls}"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`;
+  kpiDiv.innerHTML += `<div class="kpi glass ${k.cls}"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`;
 });
+
+// ── Chart defaults ──
+Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif";
+Chart.defaults.color = '#6b7280';
 
 // ── Behavior Doughnut ──
 const behLabels = Object.keys(DATA.behavior_counts).map(b => b.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase()));
 const behValues = Object.values(DATA.behavior_counts);
-const behColors = Object.keys(DATA.behavior_counts).map(b => BEHAVIOR_COLORS[b] || '#a78bfa');
+const behColors = Object.keys(DATA.behavior_counts).map(b => BEHAVIOR_COLORS[b] || '#8b5cf6');
 
 new Chart(document.getElementById('behaviorChart'), {
   type: 'doughnut',
   data: {
     labels: behLabels,
-    datasets: [{ data: behValues, backgroundColor: behColors, borderWidth: 0, hoverOffset: 8 }]
+    datasets: [{ data: behValues, backgroundColor: behColors, borderWidth: 2, borderColor: '#fff', hoverOffset: 10 }]
   },
   options: {
     responsive: true,
+    cutout: '65%',
     plugins: {
-      legend: { position: 'right', labels: { color: '#f1f5f9', padding: 14, font: { size: 11 } } }
+      legend: { position: 'right', labels: { color: '#374151', padding: 14, font: { size: 11, weight: '600' }, usePointStyle: true, pointStyleWidth: 10 } }
     }
   }
 });
@@ -336,15 +472,15 @@ new Chart(document.getElementById('topWalletsChart'), {
     datasets: [{
       label: 'Received (XPL)',
       data: DATA.top_wallets.map(w => w.received),
-      backgroundColor: DATA.top_wallets.map(w => BEHAVIOR_COLORS[w.behavior] || '#a78bfa'),
-      borderRadius: 4,
+      backgroundColor: DATA.top_wallets.map((w,i) => CHART_PALETTE[i % CHART_PALETTE.length]),
+      borderRadius: 6, borderSkipped: false,
     }]
   },
   options: {
     responsive: true, indexAxis: 'y',
     scales: {
-      x: { ticks: { color: '#94a3b8', callback: v => fmtK(v) }, grid: { color: 'rgba(255,255,255,0.05)' } },
-      y: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } }
+      x: { ticks: { color: '#6b7280', callback: v => fmtK(v) }, grid: { color: 'rgba(99,102,241,0.06)' } },
+      y: { ticks: { color: '#6b7280', font: { family: "'SF Mono', Consolas", size: 9 } }, grid: { display: false } }
     },
     plugins: {
       legend: { display: false },
@@ -362,19 +498,19 @@ new Chart(document.getElementById('velocityChart'), {
     datasets: [{
       label: 'XPL/day',
       data: sellingWallets.map(w => w.velocity),
-      backgroundColor: sellingWallets.map(w => BEHAVIOR_COLORS[w.behavior] || '#a78bfa'),
-      borderRadius: 4,
+      backgroundColor: sellingWallets.map(w => BEHAVIOR_COLORS[w.behavior] || '#8b5cf6'),
+      borderRadius: 6, borderSkipped: false,
     }]
   },
   options: {
     responsive: true, indexAxis: 'y',
     scales: {
-      x: { ticks: { color: '#94a3b8', callback: v => fmtK(v) }, grid: { color: 'rgba(255,255,255,0.05)' } },
-      y: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } }
+      x: { ticks: { color: '#6b7280', callback: v => fmtK(v) }, grid: { color: 'rgba(99,102,241,0.06)' } },
+      y: { ticks: { color: '#6b7280', font: { family: "'SF Mono', Consolas", size: 9 } }, grid: { display: false } }
     },
     plugins: {
       legend: { display: false },
-      tooltip: { callbacks: { label: ctx => fmt(ctx.raw) + ' XPL/day (' + ctx.label + ')' } }
+      tooltip: { callbacks: { label: ctx => fmt(ctx.raw) + ' XPL/day' } }
     }
   }
 });
@@ -396,19 +532,19 @@ new Chart(document.getElementById('timeToSellChart'), {
     datasets: [{
       label: 'Hours to First Sell',
       data: ttfs.map(t => Math.round(t.hours * 10) / 10),
-      backgroundColor: ttfs.map(t => BEHAVIOR_COLORS[t.behavior] || '#a78bfa'),
-      borderRadius: 4,
+      backgroundColor: ttfs.map(t => BEHAVIOR_COLORS[t.behavior] || '#8b5cf6'),
+      borderRadius: 6, borderSkipped: false,
     }]
   },
   options: {
     responsive: true,
     scales: {
-      y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'Hours', color: '#94a3b8' } },
-      x: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } }
+      y: { ticks: { color: '#6b7280' }, grid: { color: 'rgba(99,102,241,0.06)' }, title: { display: true, text: 'Hours', color: '#6b7280' } },
+      x: { ticks: { color: '#6b7280', font: { family: "'SF Mono', Consolas", size: 9 } }, grid: { display: false } }
     },
     plugins: {
       legend: { display: false },
-      tooltip: { callbacks: { label: ctx => ctx.raw + ' hours after unlock (' + fmt(ttfs[ctx.dataIndex].received) + ' XPL received)' } }
+      tooltip: { callbacks: { label: ctx => ctx.raw + ' hours after unlock (' + fmt(ttfs[ctx.dataIndex].received) + ' XPL)' } }
     }
   }
 });
@@ -420,24 +556,24 @@ new Chart(document.getElementById('soldRemainingChart'), {
   data: {
     labels: svr_wallets.map(w => w.label ? w.short_addr + ' (' + w.label + ')' : w.short_addr),
     datasets: [
-      { label: 'Sold', data: svr_wallets.map(w => w.sold), backgroundColor: '#f87171', borderRadius: 4 },
-      { label: 'Remaining', data: svr_wallets.map(w => w.remaining), backgroundColor: '#34d399', borderRadius: 4 },
+      { label: 'Sold', data: svr_wallets.map(w => w.sold), backgroundColor: '#ef4444', borderRadius: 6 },
+      { label: 'Remaining', data: svr_wallets.map(w => w.remaining), backgroundColor: '#10b981', borderRadius: 6 },
     ]
   },
   options: {
     responsive: true,
     scales: {
-      x: { stacked: true, ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } },
-      y: { stacked: true, ticks: { color: '#94a3b8', callback: v => fmtK(v) }, grid: { color: 'rgba(255,255,255,0.05)' } }
+      x: { stacked: true, ticks: { color: '#6b7280', font: { family: "'SF Mono', Consolas", size: 9 } }, grid: { display: false } },
+      y: { stacked: true, ticks: { color: '#6b7280', callback: v => fmtK(v) }, grid: { color: 'rgba(99,102,241,0.06)' } }
     },
     plugins: {
-      legend: { labels: { color: '#f1f5f9', padding: 20 } },
+      legend: { labels: { color: '#374151', padding: 20, font: { weight: '600' }, usePointStyle: true, pointStyleWidth: 10 } },
       tooltip: { callbacks: { label: ctx => ctx.dataset.label + ': ' + fmt(ctx.raw) + ' XPL' } }
     }
   }
 });
 
-// ── Sortable Table ──
+// ── Sortable Table with Clickable Addresses ──
 const columns = [
   { key: 'rank', label: '#', sortType: 'num' },
   { key: 'address', label: 'Address', sortType: 'str' },
@@ -493,16 +629,16 @@ function renderTable() {
   tbody.innerHTML = '';
   rows.forEach(r => {
     const tr = document.createElement('tr');
-    const barColor = BEHAVIOR_COLORS[r.behavior] || '#a78bfa';
-    const barPct = Math.min(r.pct_sold, 100);
-    const labelHtml = r.label ? `<span class="lbl">${r.label}</span>` : '';
+    const barColor = BEHAVIOR_COLORS[r.behavior] || '#8b5cf6';
+    const barPct = Math.min(r.pct_sold || 0, 100);
+    const addrUrl = PLASMASCAN_BASE + '/address/' + r.address;
     tr.innerHTML =
       `<td class="num">${r.rank}</td>` +
-      `<td class="addr">${r.short_addr}</td>` +
+      `<td><a href="${addrUrl}" target="_blank" rel="noopener" class="addr-link" title="View on PlasmaScan: ${r.address}">${r.short_addr}</a></td>` +
       `<td>${r.label || '<span class="dim">-</span>'}</td>` +
       `<td class="num">${fmt(r.received)}</td>` +
       `<td class="num">${fmt(r.sold)}</td>` +
-      `<td><div class="sold-bar"><div class="sold-bar-fill" style="width:${barPct}%;background:${barColor}"></div></div> ${r.pct_sold}%</td>` +
+      `<td><div class="sold-bar"><div class="sold-bar-fill" style="width:${barPct}%;background:${barColor}"></div></div> ${r.pct_sold || 0}%</td>` +
       `<td class="num">${fmt(r.remaining)}</td>` +
       `<td><span class="badge ${r.behavior}">${r.behavior_label}</span></td>` +
       `<td class="mono dim">${fmtDate(r.unlock_date)}</td>` +
@@ -511,7 +647,7 @@ function renderTable() {
       `<td class="num">${r.num_sell_txs || '-'}</td>` +
       `<td class="num" style="color:${r.velocity > 0 ? 'var(--red)' : 'var(--muted)'}">${r.velocity > 0 ? fmtK(r.velocity) + '/d' : '-'}</td>` +
       `<td class="num">${r.days_selling > 0 ? r.days_selling + 'd' : '-'}</td>` +
-      `<td class="dim" style="font-size:10px">${r.source}</td>`;
+      `<td class="dim" style="font-size:10px">${r.source || '-'}</td>`;
     tbody.appendChild(tr);
   });
 }
