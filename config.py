@@ -11,13 +11,22 @@ RPC_URL = os.getenv("PLASMA_RPC_URL", "https://rpc.plasma.to")
 PLASMASCAN_API_URL = os.getenv("PLASMASCAN_API_URL", "https://plasmascan.to/api")
 PLASMASCAN_API_KEY = os.getenv("PLASMASCAN_API_KEY", "")
 
+# ── External Analytics APIs ────────────────────────────────
+ARKHAM_API_KEY = os.getenv("ARKHAM_API_KEY", "")
+ARKHAM_API_URL = "https://api.arkhamintelligence.com"
+
 # ── Token ───────────────────────────────────────────────────
 XPL_DECIMALS = 18
 XPL_SYMBOL = "XPL"
+# XPL contract on Plasma mainnet
+XPL_CONTRACT = "0x405fbc9004d857903bfd6b3357792d71a50726b0"
 
 # ── Date Range (January 2026 unlocks) ──────────────────────
 UNLOCK_START = "2026-01-01"
 UNLOCK_END = "2026-01-31"
+
+# Monthly ecosystem unlock amount (~88.89M XPL)
+MONTHLY_ECOSYSTEM_UNLOCK_XPL = 88_888_889
 
 # ── Classification Defaults ────────────────────────────────
 # Methods: "zscore", "mad", "iqr", "percentile", "log_zscore"

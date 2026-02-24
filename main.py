@@ -24,6 +24,9 @@ Usage
 
     # Save results to JSON
     python main.py --discover --output results.json
+
+    # Offline demo with synthetic data (no RPC/API needed)
+    python main.py --sample
 """
 
 import argparse
@@ -35,6 +38,7 @@ import config
 from fetcher import PlasmaFetcher
 from classifier import classify_wallets
 from tracker import track_selling, generate_report
+from sample_data import generate_sample_wallets, generate_sample_balances
 
 
 def parse_args():
@@ -58,6 +62,8 @@ def parse_args():
                      help="Auto-discover distributors by scanning blocks")
     src.add_argument("--wallets-file", type=str, default="",
                      help="File with wallet addresses to track (one per line)")
+    src.add_argument("--sample", action="store_true",
+                     help="Run with synthetic sample data (no RPC needed)")
 
     # Scan parameters
     p.add_argument("--min-value", type=float, default=10_000,
@@ -97,8 +103,90 @@ def _progress(i, total):
         print()
 
 
+def _run_sample(args):
+    """Run the full pipeline with synthetic sample data (no network needed)."""
+    import pandas as pd
+
+    print("=" * 60)
+    print("  SAMPLE MODE — Using synthetic data (no RPC/API calls)")
+    print("=" * 60)
+
+    # Generate sample wallet unlock amounts
+    print(f"\nGenerating sample wallets...")
+    wallet_amounts = generate_sample_wallets(n_wallets=80)
+    total = sum(wallet_amounts.values())
+    print(f"  {len(wallet_amounts)} wallets, total {total:,.0f} XPL unlocked")
+
+    # Classify
+    print(f"\nClassifying wallets  (method={args.method}, "
+          f"threshold={args.threshold}) ...")
+    wallets_df, stats = classify_wallets(
+        wallet_amounts,
+        method=args.method,
+        threshold=args.threshold,
+    )
+    print(f"  Cutoff: {stats['cutoff_xpl']:,.2f} XPL")
+    print(f"  Large:  {stats['n_large']} / {stats['n_total']} wallets")
+
+    if stats["n_large"] == 0:
+        print("\nNo wallets classified as 'large'. Try lowering --threshold.")
+        return
+
+    # Simulate current balances instead of fetching from RPC
+    large = wallets_df[wallets_df["is_large"]].copy()
+    sample_balances = generate_sample_balances(
+        {r["address"]: r["amount_xpl"] for _, r in large.iterrows()}
+    )
+
+    large["current_balance"] = large["address"].map(sample_balances)
+    large["balance_known"] = True
+    large["amount_sold"] = (
+        (large["amount_xpl"] - large["current_balance"]).clip(lower=0)
+    )
+    large["pct_sold"] = large.apply(
+        lambda r: round(r["amount_sold"] / r["amount_xpl"] * 100, 2)
+        if r["amount_xpl"] > 0 else 0.0,
+        axis=1,
+    )
+    large["remaining"] = large["current_balance"]
+    large["behavior"] = large["pct_sold"].apply(
+        lambda p: "heavy_seller" if p >= 75
+        else "moderate_seller" if p >= 40
+        else "light_seller" if p >= 10
+        else "holder"
+    )
+    tracking_df = large.sort_values("amount_sold", ascending=False).reset_index(drop=True)
+
+    # Report
+    from tracker import generate_report
+    report = generate_report(tracking_df, stats)
+    print(f"\n{report}")
+
+    # Save
+    if args.output:
+        payload = {
+            "config": {
+                "start_date": args.start_date,
+                "end_date": args.end_date,
+                "method": args.method,
+                "threshold": args.threshold,
+                "mode": "sample",
+            },
+            "stats": stats,
+            "large_wallets": tracking_df.to_dict(orient="records"),
+        }
+        with open(args.output, "w") as f:
+            json.dump(payload, f, indent=2, default=str)
+        print(f"\nResults saved to {args.output}")
+
+
 def main():
     args = parse_args()
+
+    # ── Sample mode (offline) ──────────────────────────────
+    if args.sample:
+        _run_sample(args)
+        return
 
     # ── Connect ─────────────────────────────────────────────
     rpc = args.rpc_url or None
