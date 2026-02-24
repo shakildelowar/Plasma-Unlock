@@ -26,83 +26,83 @@
   .header h1 span { color: var(--accent); }
   .header .meta { color: var(--muted); font-size: 13px; margin-top: 6px; }
 
-  /* KPI cards */
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
   .kpi {
     background: var(--surface); border-radius: 12px; padding: 20px;
     border: 1px solid var(--surface2); text-align: center;
   }
-  .kpi .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-  .kpi .value { font-size: 28px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
-  .kpi .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .kpi .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .kpi .value { font-size: 26px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .kpi.green .value { color: var(--green); }
   .kpi.red .value { color: var(--red); }
   .kpi.blue .value { color: var(--accent); }
   .kpi.amber .value { color: var(--amber); }
+  .kpi.purple .value { color: var(--purple); }
 
-  /* Charts */
   .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
   @media (max-width: 900px) { .charts { grid-template-columns: 1fr; } }
   .chart-card {
     background: var(--surface); border-radius: 12px; padding: 20px;
     border: 1px solid var(--surface2);
   }
-  .chart-card h3 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+  .chart-card h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
   .chart-wrap { position: relative; width: 100%; }
 
-  /* Table */
   .table-section {
     background: var(--surface); border-radius: 12px; padding: 20px;
     border: 1px solid var(--surface2); margin-bottom: 28px; overflow-x: auto;
   }
   .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
-  .table-header h3 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .table-header h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
   .search-box {
     background: var(--surface2); border: 1px solid #475569; border-radius: 8px;
-    padding: 8px 14px; color: var(--text); font-size: 13px; width: 280px;
+    padding: 8px 14px; color: var(--text); font-size: 13px; width: 300px;
     outline: none; transition: border-color 0.2s;
   }
   .search-box:focus { border-color: var(--accent); }
 
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
   th {
-    text-align: left; padding: 10px 12px; font-weight: 600; color: var(--muted);
+    text-align: left; padding: 8px 10px; font-weight: 600; color: var(--muted);
     border-bottom: 2px solid var(--surface2); cursor: pointer; white-space: nowrap;
-    user-select: none; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    user-select: none; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
   }
   th:hover { color: var(--accent); }
-  th .arrow { font-size: 10px; margin-left: 4px; }
+  th .arrow { font-size: 9px; margin-left: 3px; }
   td {
-    padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
     white-space: nowrap;
   }
   tr:hover td { background: rgba(56, 189, 248, 0.04); }
-  .addr { font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; color: var(--accent); }
-  .num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'Consolas', monospace; font-size: 12px; }
+  .mono { font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; }
+  .addr { font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; color: var(--accent); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'Consolas', monospace; font-size: 11px; }
+  .dim { color: var(--muted); font-size: 11px; }
   .badge {
-    display: inline-block; padding: 2px 10px; border-radius: 9999px;
-    font-size: 11px; font-weight: 600; text-transform: capitalize;
+    display: inline-block; padding: 2px 8px; border-radius: 9999px;
+    font-size: 10px; font-weight: 600; text-transform: capitalize;
   }
   .badge.heavy_seller { background: rgba(248,113,113,0.2); color: var(--red); }
   .badge.moderate_seller { background: rgba(251,191,36,0.2); color: var(--amber); }
   .badge.light_seller { background: rgba(96,165,250,0.2); color: var(--blue); }
   .badge.holder { background: rgba(52,211,153,0.2); color: var(--green); }
 
-  /* Sold bar */
-  .sold-bar { width: 100px; height: 8px; background: var(--surface2); border-radius: 4px; display: inline-block; vertical-align: middle; }
-  .sold-bar-fill { height: 100%; border-radius: 4px; }
+  .sold-bar { width: 80px; height: 6px; background: var(--surface2); border-radius: 3px; display: inline-block; vertical-align: middle; }
+  .sold-bar-fill { height: 100%; border-radius: 3px; }
 
-  /* Sources */
+  .lbl { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 600; background: rgba(167,139,250,0.15); color: var(--purple); margin-left: 4px; }
+
   .sources {
     background: var(--surface); border-radius: 12px; padding: 20px;
     border: 1px solid var(--surface2);
   }
-  .sources h3 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .sources h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
   .source-item { display: flex; gap: 16px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
   .source-item:last-child { border: none; }
-  .source-name { font-weight: 600; min-width: 160px; color: var(--accent); }
-  .source-url { font-family: monospace; font-size: 12px; color: var(--muted); word-break: break-all; }
-  .source-desc { font-size: 13px; color: var(--text); }
+  .source-name { font-weight: 600; min-width: 140px; color: var(--accent); font-size: 13px; }
+  .source-url { font-family: monospace; font-size: 11px; color: var(--muted); word-break: break-all; }
+  .source-desc { font-size: 12px; color: var(--text); }
 
   .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 32px; }
 </style>
@@ -122,19 +122,27 @@
     <div class="chart-wrap"><canvas id="behaviorChart"></canvas></div>
   </div>
   <div class="chart-card">
-    <h3>Top Wallets — Amount Received (XPL)</h3>
+    <h3>Top Wallets - Amount Received (XPL)</h3>
     <div class="chart-wrap"><canvas id="topWalletsChart"></canvas></div>
   </div>
+  <div class="chart-card">
+    <h3>Sell Velocity - XPL Sold Per Day</h3>
+    <div class="chart-wrap"><canvas id="velocityChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Time to First Sell (Hours After Unlock)</h3>
+    <div class="chart-wrap"><canvas id="timeToSellChart"></canvas></div>
+  </div>
   <div class="chart-card" style="grid-column: 1 / -1;">
-    <h3>Sold vs Remaining — Large Wallets</h3>
+    <h3>Sold vs Remaining - Large Wallets</h3>
     <div class="chart-wrap"><canvas id="soldRemainingChart"></canvas></div>
   </div>
 </div>
 
 <div class="table-section">
   <div class="table-header">
-    <h3>Large Wallet Details</h3>
-    <input type="text" class="search-box" id="searchBox" placeholder="Search address or behavior...">
+    <h3>Large Wallet Details - Full Breakdown with Timing</h3>
+    <input type="text" class="search-box" id="searchBox" placeholder="Search address, behavior, label, or source...">
   </div>
   <table>
     <thead><tr id="tableHead"></tr></thead>
@@ -163,7 +171,17 @@ const DATA = {
       "remaining": 3549843.73,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Arkham Intel (Ecosystem Development Fund)",
+      "unlock_date": "2026-01-25 19:24 UTC",
+      "unlock_block": 48209746,
+      "unlock_tx": "0x79170c9c1f7b5232e78a916cf32e4b646c44b0cb2ffdc00288e8ef7929ea0939",
+      "first_sell_date": "2026-01-26 02:08 UTC",
+      "last_activity": "2026-02-22 18:29 UTC",
+      "num_sell_txs": 20,
+      "velocity": 549411.35,
+      "days_since_unlock": 29.7,
+      "days_selling": 27.7,
+      "label": "Ecosystem Development Fund"
     },
     {
       "rank": 2,
@@ -176,7 +194,17 @@ const DATA = {
       "remaining": 1655998.08,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Arkham Intel (Plasma Foundation)",
+      "unlock_date": "2026-01-25 17:19 UTC",
+      "unlock_block": 48205992,
+      "unlock_tx": "0x8037f6366194f460fbb0ce5d414457de7c565bcf3300870460e41b89a3eac992",
+      "first_sell_date": "2026-01-25 21:09 UTC",
+      "last_activity": "2026-02-24 00:26 UTC",
+      "num_sell_txs": 33,
+      "velocity": 341991.91,
+      "days_since_unlock": 29.8,
+      "days_selling": 29.1,
+      "label": "Plasma Foundation"
     },
     {
       "rank": 3,
@@ -189,7 +217,17 @@ const DATA = {
       "remaining": 782348.42,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Arkham Intel (Early Investor B)",
+      "unlock_date": "2026-01-25 15:47 UTC",
+      "unlock_block": 48203233,
+      "unlock_tx": "0xabfffdef5c0d7e914a79256b84c55cb5e1697abca919c7ed7e3069adc8b41903",
+      "first_sell_date": "2026-01-25 20:11 UTC",
+      "last_activity": "2026-02-23 21:42 UTC",
+      "num_sell_txs": 20,
+      "velocity": 170320.59,
+      "days_since_unlock": 29.8,
+      "days_selling": 29.1,
+      "label": "Early Investor B"
     },
     {
       "rank": 4,
@@ -202,7 +240,17 @@ const DATA = {
       "remaining": 982275.84,
       "behavior": "moderate_seller",
       "behavior_label": "Moderate Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 14:48 UTC",
+      "unlock_block": 48201453,
+      "unlock_tx": "0x941d1fa6c88b9ce60d578c685b53dec04adc36f88562374499dde13cc1d3f276",
+      "first_sell_date": "2026-01-27 00:00 UTC",
+      "last_activity": "2026-02-20 21:43 UTC",
+      "num_sell_txs": 11,
+      "velocity": 87107.56,
+      "days_since_unlock": 29.9,
+      "days_selling": 24.9,
+      "label": NaN
     },
     {
       "rank": 5,
@@ -215,7 +263,17 @@ const DATA = {
       "remaining": 786485.0,
       "behavior": "moderate_seller",
       "behavior_label": "Moderate Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 07:51 UTC",
+      "unlock_block": 48188937,
+      "unlock_tx": "0x4fed13dd8f034d7f85676040acaeaf00570199fd9bfbd05c91ecb6f901c8d6d4",
+      "first_sell_date": "2026-01-26 12:34 UTC",
+      "last_activity": "2026-02-19 14:54 UTC",
+      "num_sell_txs": 18,
+      "velocity": 82484.57,
+      "days_since_unlock": 30.2,
+      "days_selling": 24.1,
+      "label": NaN
     },
     {
       "rank": 6,
@@ -228,7 +286,17 @@ const DATA = {
       "remaining": 2271302.47,
       "behavior": "moderate_seller",
       "behavior_label": "Moderate Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-24 22:03 UTC",
+      "unlock_block": 48171317,
+      "unlock_tx": "0xa3ff252ebca25d82e75180c084fd43bfae3348926cf6513ab36dca7fe5fd31c3",
+      "first_sell_date": "2026-01-26 04:47 UTC",
+      "last_activity": "2026-02-23 09:14 UTC",
+      "num_sell_txs": 13,
+      "velocity": 66386.92,
+      "days_since_unlock": 30.6,
+      "days_selling": 28.2,
+      "label": NaN
     },
     {
       "rank": 7,
@@ -241,7 +309,17 @@ const DATA = {
       "remaining": 5465526.16,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Arkham Intel (Early Investor A)",
+      "unlock_date": "2026-01-26 15:55 UTC",
+      "unlock_block": 48246678,
+      "unlock_tx": "0x8b466b39dd544b57b0ec845e05db3b1696f6d9221557527291b52e9d40b88b52",
+      "first_sell_date": "2026-02-04 10:45 UTC",
+      "last_activity": "2026-02-17 15:20 UTC",
+      "num_sell_txs": 7,
+      "velocity": 138491.45,
+      "days_since_unlock": 28.8,
+      "days_selling": 13.2,
+      "label": "Early Investor A"
     },
     {
       "rank": 8,
@@ -254,7 +332,17 @@ const DATA = {
       "remaining": 8026547.08,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Arkham Intel (Team Vesting Contract)",
+      "unlock_date": "2026-01-24 14:38 UTC",
+      "unlock_block": 48157942,
+      "unlock_tx": "0xa1e533d00cec242fcd5ce8e24bc04c108562b4350086f66f30e6623115bc4e7a",
+      "first_sell_date": "2026-01-31 04:14 UTC",
+      "last_activity": "2026-02-16 08:03 UTC",
+      "num_sell_txs": 6,
+      "velocity": 96107.56,
+      "days_since_unlock": 30.9,
+      "days_selling": 16.2,
+      "label": "Team Vesting Contract"
     },
     {
       "rank": 9,
@@ -267,7 +355,17 @@ const DATA = {
       "remaining": 332486.14,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-26 10:22 UTC",
+      "unlock_block": 48236666,
+      "unlock_tx": "0xaca69692ce8422c50d2c62001ca9eaec9120f6488b789ca7ac542b3d3bbbdd2a",
+      "first_sell_date": "2026-01-26 22:03 UTC",
+      "last_activity": "2026-02-23 00:19 UTC",
+      "num_sell_txs": 23,
+      "velocity": 39206.57,
+      "days_since_unlock": 29.1,
+      "days_selling": 27.1,
+      "label": NaN
     },
     {
       "rank": 10,
@@ -280,7 +378,17 @@ const DATA = {
       "remaining": 373662.38,
       "behavior": "moderate_seller",
       "behavior_label": "Moderate Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 22:48 UTC",
+      "unlock_block": 48215842,
+      "unlock_tx": "0x64e702c8ea7df35d3dcbbf92cb353123f92a0ba7ae9473dc017fc96926360510",
+      "first_sell_date": "2026-01-30 03:01 UTC",
+      "last_activity": "2026-02-19 13:20 UTC",
+      "num_sell_txs": 13,
+      "velocity": 50182.02,
+      "days_since_unlock": 29.5,
+      "days_selling": 20.4,
+      "label": NaN
     },
     {
       "rank": 11,
@@ -293,7 +401,17 @@ const DATA = {
       "remaining": 1796091.39,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 21:25 UTC",
+      "unlock_block": 48213352,
+      "unlock_tx": "0x96e888ec34c49b7adf4f097d2edeef91e7269a687327a9481f4c20a3e6c9b474",
+      "first_sell_date": "2026-01-31 06:29 UTC",
+      "last_activity": "2026-02-13 22:29 UTC",
+      "num_sell_txs": 7,
+      "velocity": 44090.78,
+      "days_since_unlock": 29.6,
+      "days_selling": 13.7,
+      "label": NaN
     },
     {
       "rank": 12,
@@ -306,7 +424,17 @@ const DATA = {
       "remaining": 2830658.2,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-24 21:45 UTC",
+      "unlock_block": 48170761,
+      "unlock_tx": "0xb3f82e7c6ae672e2af6c80d34f42d901bf3e838a4f198c4ef8302acc5fdf5dc1",
+      "first_sell_date": "2026-02-05 03:49 UTC",
+      "last_activity": "2026-02-10 20:45 UTC",
+      "num_sell_txs": 2,
+      "velocity": 104078.16,
+      "days_since_unlock": 30.6,
+      "days_selling": 5.7,
+      "label": NaN
     },
     {
       "rank": 13,
@@ -319,7 +447,17 @@ const DATA = {
       "remaining": 140220.59,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-26 12:34 UTC",
+      "unlock_block": 48240624,
+      "unlock_tx": "0xef6f4c7cff96ebbd1f84642f152a91b9626629f2da80ba423f2e6c66fb2a8e89",
+      "first_sell_date": "2026-01-26 19:18 UTC",
+      "last_activity": "2026-02-22 12:15 UTC",
+      "num_sell_txs": 26,
+      "velocity": 18492.99,
+      "days_since_unlock": 29.0,
+      "days_selling": 26.7,
+      "label": NaN
     },
     {
       "rank": 14,
@@ -332,7 +470,17 @@ const DATA = {
       "remaining": 1146361.01,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 22:39 UTC",
+      "unlock_block": 48215590,
+      "unlock_tx": "0x076298fd35b083b784c4dd1688610bb2a85e7be61af6ca17e445b419f7e98711",
+      "first_sell_date": "2026-02-07 23:07 UTC",
+      "last_activity": "2026-02-20 16:37 UTC",
+      "num_sell_txs": 9,
+      "velocity": 26514.8,
+      "days_since_unlock": 29.6,
+      "days_selling": 12.7,
+      "label": NaN
     },
     {
       "rank": 15,
@@ -345,7 +493,17 @@ const DATA = {
       "remaining": 59284.06,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-25 09:35 UTC",
+      "unlock_block": 48192058,
+      "unlock_tx": "0xc63f2a7987adbd5efb760fa62453beef3d4756890e55aaf06536358edcc49703",
+      "first_sell_date": "2026-01-25 10:09 UTC",
+      "last_activity": "2026-02-23 22:07 UTC",
+      "num_sell_txs": 37,
+      "velocity": 7139.08,
+      "days_since_unlock": 30.1,
+      "days_selling": 29.5,
+      "label": NaN
     },
     {
       "rank": 16,
@@ -358,7 +516,17 @@ const DATA = {
       "remaining": 343950.39,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-27 02:20 UTC",
+      "unlock_block": 48265412,
+      "unlock_tx": "0x0a3331b80c48c8d9dd9ae6e718a7e43ae0027b1d23b09286e62d28700e6ca76b",
+      "first_sell_date": "2026-02-07 03:57 UTC",
+      "last_activity": "2026-02-21 18:55 UTC",
+      "num_sell_txs": 8,
+      "velocity": 13918.34,
+      "days_since_unlock": 28.4,
+      "days_selling": 14.6,
+      "label": NaN
     },
     {
       "rank": 17,
@@ -371,7 +539,17 @@ const DATA = {
       "remaining": 544980.96,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-26 06:34 UTC",
+      "unlock_block": 48229826,
+      "unlock_tx": "0x8b00ee3c0af020f044fd82d8bd2cae05cf6ab7fd971dc2a34e3852c2947c8896",
+      "first_sell_date": "2026-02-04 07:39 UTC",
+      "last_activity": "2026-02-18 04:02 UTC",
+      "num_sell_txs": 3,
+      "velocity": 5374.23,
+      "days_since_unlock": 29.2,
+      "days_selling": 13.8,
+      "label": NaN
     },
     {
       "rank": 18,
@@ -384,7 +562,17 @@ const DATA = {
       "remaining": 377674.04,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-26 20:46 UTC",
+      "unlock_block": 48255388,
+      "unlock_tx": "0xab466145907db85568c73689be2f5a778bcddd810ae4408f2981e8c9959dd154",
+      "first_sell_date": "2026-02-07 14:58 UTC",
+      "last_activity": "2026-02-16 19:30 UTC",
+      "num_sell_txs": 4,
+      "velocity": 8059.37,
+      "days_since_unlock": 28.6,
+      "days_selling": 9.2,
+      "label": NaN
     },
     {
       "rank": 19,
@@ -397,7 +585,17 @@ const DATA = {
       "remaining": 279751.68,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-27 02:09 UTC",
+      "unlock_block": 48265087,
+      "unlock_tx": "0xbb41ca966652d7e5b1bceaafeb21d8e492c8879d07b5685fa8457c20b8f81f31",
+      "first_sell_date": "2026-02-07 06:52 UTC",
+      "last_activity": "2026-02-18 23:24 UTC",
+      "num_sell_txs": 3,
+      "velocity": 5601.14,
+      "days_since_unlock": 28.4,
+      "days_selling": 11.7,
+      "label": NaN
     },
     {
       "rank": 20,
@@ -410,7 +608,17 @@ const DATA = {
       "remaining": 854891.26,
       "behavior": "holder",
       "behavior_label": "Holder",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-25 01:19 UTC",
+      "unlock_block": 48177183,
+      "unlock_tx": "0x1bbe886c9330dd10558f81b50305c8814b01194811183e7b86f7e9a3f0279185",
+      "first_sell_date": NaN,
+      "last_activity": "2026-01-25 06:40 UTC",
+      "num_sell_txs": 0,
+      "velocity": 0,
+      "days_since_unlock": 30.4,
+      "days_selling": 0,
+      "label": NaN
     },
     {
       "rank": 21,
@@ -423,7 +631,17 @@ const DATA = {
       "remaining": 227912.67,
       "behavior": "holder",
       "behavior_label": "Holder",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-26 03:42 UTC",
+      "unlock_block": 48224671,
+      "unlock_tx": "0x1bb2ff62b9518dacaba0bc83305e1c6fc7e74ee003c782915619002fea281d42",
+      "first_sell_date": NaN,
+      "last_activity": "2026-01-26 19:59 UTC",
+      "num_sell_txs": 0,
+      "velocity": 0,
+      "days_since_unlock": 29.3,
+      "days_selling": 0,
+      "label": NaN
     },
     {
       "rank": 22,
@@ -436,7 +654,17 @@ const DATA = {
       "remaining": 407255.02,
       "behavior": "holder",
       "behavior_label": "Holder",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-25 02:55 UTC",
+      "unlock_block": 48180056,
+      "unlock_tx": "0x1575310e8258bef20fe29a242d642a4bfc038683b81813c672502037ef674b86",
+      "first_sell_date": NaN,
+      "last_activity": "2026-01-25 18:20 UTC",
+      "num_sell_txs": 0,
+      "velocity": 0,
+      "days_since_unlock": 30.4,
+      "days_selling": 0,
+      "label": NaN
     },
     {
       "rank": 23,
@@ -449,7 +677,17 @@ const DATA = {
       "remaining": 3141309.7,
       "behavior": "holder",
       "behavior_label": "Holder",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 03:34 UTC",
+      "unlock_block": 48181242,
+      "unlock_tx": "0xe3d3d5506e842c3a8fe4ee6a07e6de6999bceb464ffa9ece210bc66ae1a7c743",
+      "first_sell_date": NaN,
+      "last_activity": "2026-01-25 09:46 UTC",
+      "num_sell_txs": 0,
+      "velocity": 0,
+      "days_since_unlock": 30.4,
+      "days_selling": 0,
+      "label": NaN
     },
     {
       "rank": 24,
@@ -462,7 +700,17 @@ const DATA = {
       "remaining": 749632.19,
       "behavior": "holder",
       "behavior_label": "Holder",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-24 15:03 UTC",
+      "unlock_block": 48158691,
+      "unlock_tx": "0x5c45e15e6af85e8881e54f9f4772aa267d4473cb74024bfe4c46e2f68241a91f",
+      "first_sell_date": NaN,
+      "last_activity": "2026-01-25 09:07 UTC",
+      "num_sell_txs": 0,
+      "velocity": 0,
+      "days_since_unlock": 30.9,
+      "days_selling": 0,
+      "label": NaN
     },
     {
       "rank": 25,
@@ -475,7 +723,17 @@ const DATA = {
       "remaining": 1520991.99,
       "behavior": "holder",
       "behavior_label": "Holder",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 16:36 UTC",
+      "unlock_block": 48204689,
+      "unlock_tx": "0x9b4a81cf0d890b8125190d6b603ff0c56a01528da66809f17d814bd16b0688fd",
+      "first_sell_date": NaN,
+      "last_activity": "2026-01-26 03:54 UTC",
+      "num_sell_txs": 0,
+      "velocity": 0,
+      "days_since_unlock": 29.8,
+      "days_selling": 0,
+      "label": NaN
     }
   ],
   "top_wallets": [
@@ -490,7 +748,17 @@ const DATA = {
       "remaining": 3549843.73,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Arkham Intel (Ecosystem Development Fund)",
+      "unlock_date": "2026-01-25 19:24 UTC",
+      "unlock_block": 48209746,
+      "unlock_tx": "0x79170c9c1f7b5232e78a916cf32e4b646c44b0cb2ffdc00288e8ef7929ea0939",
+      "first_sell_date": "2026-01-26 02:08 UTC",
+      "last_activity": "2026-02-22 18:29 UTC",
+      "num_sell_txs": 20,
+      "velocity": 549411.35,
+      "days_since_unlock": 29.7,
+      "days_selling": 27.7,
+      "label": "Ecosystem Development Fund"
     },
     {
       "rank": 2,
@@ -503,7 +771,17 @@ const DATA = {
       "remaining": 1655998.08,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Arkham Intel (Plasma Foundation)",
+      "unlock_date": "2026-01-25 17:19 UTC",
+      "unlock_block": 48205992,
+      "unlock_tx": "0x8037f6366194f460fbb0ce5d414457de7c565bcf3300870460e41b89a3eac992",
+      "first_sell_date": "2026-01-25 21:09 UTC",
+      "last_activity": "2026-02-24 00:26 UTC",
+      "num_sell_txs": 33,
+      "velocity": 341991.91,
+      "days_since_unlock": 29.8,
+      "days_selling": 29.1,
+      "label": "Plasma Foundation"
     },
     {
       "rank": 3,
@@ -516,7 +794,17 @@ const DATA = {
       "remaining": 782348.42,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Arkham Intel (Early Investor B)",
+      "unlock_date": "2026-01-25 15:47 UTC",
+      "unlock_block": 48203233,
+      "unlock_tx": "0xabfffdef5c0d7e914a79256b84c55cb5e1697abca919c7ed7e3069adc8b41903",
+      "first_sell_date": "2026-01-25 20:11 UTC",
+      "last_activity": "2026-02-23 21:42 UTC",
+      "num_sell_txs": 20,
+      "velocity": 170320.59,
+      "days_since_unlock": 29.8,
+      "days_selling": 29.1,
+      "label": "Early Investor B"
     },
     {
       "rank": 4,
@@ -529,7 +817,17 @@ const DATA = {
       "remaining": 982275.84,
       "behavior": "moderate_seller",
       "behavior_label": "Moderate Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 14:48 UTC",
+      "unlock_block": 48201453,
+      "unlock_tx": "0x941d1fa6c88b9ce60d578c685b53dec04adc36f88562374499dde13cc1d3f276",
+      "first_sell_date": "2026-01-27 00:00 UTC",
+      "last_activity": "2026-02-20 21:43 UTC",
+      "num_sell_txs": 11,
+      "velocity": 87107.56,
+      "days_since_unlock": 29.9,
+      "days_selling": 24.9,
+      "label": NaN
     },
     {
       "rank": 5,
@@ -542,7 +840,17 @@ const DATA = {
       "remaining": 786485.0,
       "behavior": "moderate_seller",
       "behavior_label": "Moderate Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 07:51 UTC",
+      "unlock_block": 48188937,
+      "unlock_tx": "0x4fed13dd8f034d7f85676040acaeaf00570199fd9bfbd05c91ecb6f901c8d6d4",
+      "first_sell_date": "2026-01-26 12:34 UTC",
+      "last_activity": "2026-02-19 14:54 UTC",
+      "num_sell_txs": 18,
+      "velocity": 82484.57,
+      "days_since_unlock": 30.2,
+      "days_selling": 24.1,
+      "label": NaN
     },
     {
       "rank": 6,
@@ -555,7 +863,17 @@ const DATA = {
       "remaining": 2271302.47,
       "behavior": "moderate_seller",
       "behavior_label": "Moderate Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-24 22:03 UTC",
+      "unlock_block": 48171317,
+      "unlock_tx": "0xa3ff252ebca25d82e75180c084fd43bfae3348926cf6513ab36dca7fe5fd31c3",
+      "first_sell_date": "2026-01-26 04:47 UTC",
+      "last_activity": "2026-02-23 09:14 UTC",
+      "num_sell_txs": 13,
+      "velocity": 66386.92,
+      "days_since_unlock": 30.6,
+      "days_selling": 28.2,
+      "label": NaN
     },
     {
       "rank": 7,
@@ -568,7 +886,17 @@ const DATA = {
       "remaining": 5465526.16,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Arkham Intel (Early Investor A)",
+      "unlock_date": "2026-01-26 15:55 UTC",
+      "unlock_block": 48246678,
+      "unlock_tx": "0x8b466b39dd544b57b0ec845e05db3b1696f6d9221557527291b52e9d40b88b52",
+      "first_sell_date": "2026-02-04 10:45 UTC",
+      "last_activity": "2026-02-17 15:20 UTC",
+      "num_sell_txs": 7,
+      "velocity": 138491.45,
+      "days_since_unlock": 28.8,
+      "days_selling": 13.2,
+      "label": "Early Investor A"
     },
     {
       "rank": 8,
@@ -581,7 +909,17 @@ const DATA = {
       "remaining": 8026547.08,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Arkham Intel (Team Vesting Contract)",
+      "unlock_date": "2026-01-24 14:38 UTC",
+      "unlock_block": 48157942,
+      "unlock_tx": "0xa1e533d00cec242fcd5ce8e24bc04c108562b4350086f66f30e6623115bc4e7a",
+      "first_sell_date": "2026-01-31 04:14 UTC",
+      "last_activity": "2026-02-16 08:03 UTC",
+      "num_sell_txs": 6,
+      "velocity": 96107.56,
+      "days_since_unlock": 30.9,
+      "days_selling": 16.2,
+      "label": "Team Vesting Contract"
     },
     {
       "rank": 9,
@@ -594,7 +932,17 @@ const DATA = {
       "remaining": 332486.14,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-26 10:22 UTC",
+      "unlock_block": 48236666,
+      "unlock_tx": "0xaca69692ce8422c50d2c62001ca9eaec9120f6488b789ca7ac542b3d3bbbdd2a",
+      "first_sell_date": "2026-01-26 22:03 UTC",
+      "last_activity": "2026-02-23 00:19 UTC",
+      "num_sell_txs": 23,
+      "velocity": 39206.57,
+      "days_since_unlock": 29.1,
+      "days_selling": 27.1,
+      "label": NaN
     },
     {
       "rank": 10,
@@ -607,7 +955,17 @@ const DATA = {
       "remaining": 373662.38,
       "behavior": "moderate_seller",
       "behavior_label": "Moderate Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 22:48 UTC",
+      "unlock_block": 48215842,
+      "unlock_tx": "0x64e702c8ea7df35d3dcbbf92cb353123f92a0ba7ae9473dc017fc96926360510",
+      "first_sell_date": "2026-01-30 03:01 UTC",
+      "last_activity": "2026-02-19 13:20 UTC",
+      "num_sell_txs": 13,
+      "velocity": 50182.02,
+      "days_since_unlock": 29.5,
+      "days_selling": 20.4,
+      "label": NaN
     },
     {
       "rank": 11,
@@ -620,7 +978,17 @@ const DATA = {
       "remaining": 1796091.39,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 21:25 UTC",
+      "unlock_block": 48213352,
+      "unlock_tx": "0x96e888ec34c49b7adf4f097d2edeef91e7269a687327a9481f4c20a3e6c9b474",
+      "first_sell_date": "2026-01-31 06:29 UTC",
+      "last_activity": "2026-02-13 22:29 UTC",
+      "num_sell_txs": 7,
+      "velocity": 44090.78,
+      "days_since_unlock": 29.6,
+      "days_selling": 13.7,
+      "label": NaN
     },
     {
       "rank": 12,
@@ -633,7 +1001,17 @@ const DATA = {
       "remaining": 2830658.2,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-24 21:45 UTC",
+      "unlock_block": 48170761,
+      "unlock_tx": "0xb3f82e7c6ae672e2af6c80d34f42d901bf3e838a4f198c4ef8302acc5fdf5dc1",
+      "first_sell_date": "2026-02-05 03:49 UTC",
+      "last_activity": "2026-02-10 20:45 UTC",
+      "num_sell_txs": 2,
+      "velocity": 104078.16,
+      "days_since_unlock": 30.6,
+      "days_selling": 5.7,
+      "label": NaN
     },
     {
       "rank": 13,
@@ -646,7 +1024,17 @@ const DATA = {
       "remaining": 140220.59,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-26 12:34 UTC",
+      "unlock_block": 48240624,
+      "unlock_tx": "0xef6f4c7cff96ebbd1f84642f152a91b9626629f2da80ba423f2e6c66fb2a8e89",
+      "first_sell_date": "2026-01-26 19:18 UTC",
+      "last_activity": "2026-02-22 12:15 UTC",
+      "num_sell_txs": 26,
+      "velocity": 18492.99,
+      "days_since_unlock": 29.0,
+      "days_selling": 26.7,
+      "label": NaN
     },
     {
       "rank": 14,
@@ -659,7 +1047,17 @@ const DATA = {
       "remaining": 1146361.01,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "PlasmaScan API + Plasma RPC",
+      "unlock_date": "2026-01-25 22:39 UTC",
+      "unlock_block": 48215590,
+      "unlock_tx": "0x076298fd35b083b784c4dd1688610bb2a85e7be61af6ca17e445b419f7e98711",
+      "first_sell_date": "2026-02-07 23:07 UTC",
+      "last_activity": "2026-02-20 16:37 UTC",
+      "num_sell_txs": 9,
+      "velocity": 26514.8,
+      "days_since_unlock": 29.6,
+      "days_selling": 12.7,
+      "label": NaN
     },
     {
       "rank": 15,
@@ -672,7 +1070,17 @@ const DATA = {
       "remaining": 59284.06,
       "behavior": "heavy_seller",
       "behavior_label": "Heavy Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-25 09:35 UTC",
+      "unlock_block": 48192058,
+      "unlock_tx": "0xc63f2a7987adbd5efb760fa62453beef3d4756890e55aaf06536358edcc49703",
+      "first_sell_date": "2026-01-25 10:09 UTC",
+      "last_activity": "2026-02-23 22:07 UTC",
+      "num_sell_txs": 37,
+      "velocity": 7139.08,
+      "days_since_unlock": 30.1,
+      "days_selling": 29.5,
+      "label": NaN
     },
     {
       "rank": 16,
@@ -685,7 +1093,17 @@ const DATA = {
       "remaining": 343950.39,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-27 02:20 UTC",
+      "unlock_block": 48265412,
+      "unlock_tx": "0x0a3331b80c48c8d9dd9ae6e718a7e43ae0027b1d23b09286e62d28700e6ca76b",
+      "first_sell_date": "2026-02-07 03:57 UTC",
+      "last_activity": "2026-02-21 18:55 UTC",
+      "num_sell_txs": 8,
+      "velocity": 13918.34,
+      "days_since_unlock": 28.4,
+      "days_selling": 14.6,
+      "label": NaN
     },
     {
       "rank": 17,
@@ -698,7 +1116,17 @@ const DATA = {
       "remaining": 544980.96,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-26 06:34 UTC",
+      "unlock_block": 48229826,
+      "unlock_tx": "0x8b00ee3c0af020f044fd82d8bd2cae05cf6ab7fd971dc2a34e3852c2947c8896",
+      "first_sell_date": "2026-02-04 07:39 UTC",
+      "last_activity": "2026-02-18 04:02 UTC",
+      "num_sell_txs": 3,
+      "velocity": 5374.23,
+      "days_since_unlock": 29.2,
+      "days_selling": 13.8,
+      "label": NaN
     },
     {
       "rank": 18,
@@ -711,7 +1139,17 @@ const DATA = {
       "remaining": 377674.04,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-26 20:46 UTC",
+      "unlock_block": 48255388,
+      "unlock_tx": "0xab466145907db85568c73689be2f5a778bcddd810ae4408f2981e8c9959dd154",
+      "first_sell_date": "2026-02-07 14:58 UTC",
+      "last_activity": "2026-02-16 19:30 UTC",
+      "num_sell_txs": 4,
+      "velocity": 8059.37,
+      "days_since_unlock": 28.6,
+      "days_selling": 9.2,
+      "label": NaN
     },
     {
       "rank": 19,
@@ -724,7 +1162,17 @@ const DATA = {
       "remaining": 279751.68,
       "behavior": "light_seller",
       "behavior_label": "Light Seller",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-27 02:09 UTC",
+      "unlock_block": 48265087,
+      "unlock_tx": "0xbb41ca966652d7e5b1bceaafeb21d8e492c8879d07b5685fa8457c20b8f81f31",
+      "first_sell_date": "2026-02-07 06:52 UTC",
+      "last_activity": "2026-02-18 23:24 UTC",
+      "num_sell_txs": 3,
+      "velocity": 5601.14,
+      "days_since_unlock": 28.4,
+      "days_selling": 11.7,
+      "label": NaN
     },
     {
       "rank": 20,
@@ -737,7 +1185,17 @@ const DATA = {
       "remaining": 854891.26,
       "behavior": "holder",
       "behavior_label": "Holder",
-      "source": "Plasma RPC / PlasmaScan"
+      "source": "Plasma RPC (block scan)",
+      "unlock_date": "2026-01-25 01:19 UTC",
+      "unlock_block": 48177183,
+      "unlock_tx": "0x1bbe886c9330dd10558f81b50305c8814b01194811183e7b86f7e9a3f0279185",
+      "first_sell_date": NaN,
+      "last_activity": "2026-01-25 06:40 UTC",
+      "num_sell_txs": 0,
+      "velocity": 0,
+      "days_since_unlock": 30.4,
+      "days_selling": 0,
+      "label": NaN
     }
   ],
   "stats": {
@@ -774,22 +1232,21 @@ const DATA = {
     "threshold": 2.0,
     "mode": "sample"
   },
-  "generated": "2026-02-24 07:14 UTC"
+  "generated": "2026-02-24 16:06 UTC"
 };
 
-// ── Helpers ──
 const fmt = (n) => n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 const fmtK = (n) => {
   if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
   if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
   return n.toFixed(0);
 };
+const fmtDate = (d) => d ? d.replace(' UTC','') : '-';
+const fmtVel = (v) => v > 0 ? fmtK(v) + '/day' : '-';
 
 const BEHAVIOR_COLORS = {
-  heavy_seller: '#f87171',
-  moderate_seller: '#fbbf24',
-  light_seller: '#60a5fa',
-  holder: '#34d399',
+  heavy_seller: '#f87171', moderate_seller: '#fbbf24',
+  light_seller: '#60a5fa', holder: '#34d399',
 };
 
 // ── Meta ──
@@ -800,12 +1257,18 @@ document.getElementById('meta').innerHTML =
   `Cutoff: <strong>${fmt(DATA.stats.cutoff_xpl || 0)} XPL</strong>`;
 
 // ── KPIs ──
+const avgVelocity = DATA.wallets.filter(w => w.velocity > 0).reduce((s,w) => s + w.velocity, 0) / Math.max(1, DATA.wallets.filter(w => w.velocity > 0).length);
+const avgDaysSelling = DATA.wallets.filter(w => w.days_selling > 0).reduce((s,w) => s + w.days_selling, 0) / Math.max(1, DATA.wallets.filter(w => w.days_selling > 0).length);
+const totalSellTxs = DATA.wallets.reduce((s,w) => s + (w.num_sell_txs || 0), 0);
+
 const kpiDiv = document.getElementById('kpis');
 const kpis = [
   { label: 'Total XPL Unlocked', value: fmtK(DATA.totals.received), sub: `across ${DATA.wallets.length} large wallets`, cls: 'blue' },
   { label: 'Total XPL Sold', value: fmtK(DATA.totals.sold), sub: `${DATA.totals.pct_sold}% of received`, cls: 'red' },
-  { label: 'Total XPL Remaining', value: fmtK(DATA.totals.remaining), sub: 'still held in wallets', cls: 'green' },
+  { label: 'Total XPL Remaining', value: fmtK(DATA.totals.remaining), sub: 'potential sell pressure', cls: 'green' },
   { label: 'Large Wallets', value: DATA.stats.n_large || 0, sub: `of ${DATA.stats.n_total || 0} total (${DATA.stats.pct_large || 0}%)`, cls: 'amber' },
+  { label: 'Avg Sell Velocity', value: fmtK(avgVelocity), sub: 'XPL/day (selling wallets)', cls: 'red' },
+  { label: 'Total Sell Txs', value: totalSellTxs.toLocaleString(), sub: `avg ${Math.round(avgDaysSelling)} days active`, cls: 'purple' },
 ];
 kpis.forEach(k => {
   kpiDiv.innerHTML += `<div class="kpi ${k.cls}"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`;
@@ -825,7 +1288,7 @@ new Chart(document.getElementById('behaviorChart'), {
   options: {
     responsive: true,
     plugins: {
-      legend: { position: 'right', labels: { color: '#f1f5f9', padding: 16, font: { size: 12 } } }
+      legend: { position: 'right', labels: { color: '#f1f5f9', padding: 14, font: { size: 11 } } }
     }
   }
 });
@@ -834,7 +1297,7 @@ new Chart(document.getElementById('behaviorChart'), {
 new Chart(document.getElementById('topWalletsChart'), {
   type: 'bar',
   data: {
-    labels: DATA.top_wallets.map(w => w.short_addr),
+    labels: DATA.top_wallets.map(w => w.label ? w.short_addr + ' (' + w.label + ')' : w.short_addr),
     datasets: [{
       label: 'Received (XPL)',
       data: DATA.top_wallets.map(w => w.received),
@@ -846,11 +1309,71 @@ new Chart(document.getElementById('topWalletsChart'), {
     responsive: true, indexAxis: 'y',
     scales: {
       x: { ticks: { color: '#94a3b8', callback: v => fmtK(v) }, grid: { color: 'rgba(255,255,255,0.05)' } },
-      y: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 10 } }, grid: { display: false } }
+      y: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } }
     },
     plugins: {
       legend: { display: false },
       tooltip: { callbacks: { label: ctx => fmt(ctx.raw) + ' XPL' } }
+    }
+  }
+});
+
+// ── Sell Velocity Chart ──
+const sellingWallets = DATA.wallets.filter(w => w.velocity > 0).sort((a,b) => b.velocity - a.velocity).slice(0, 15);
+new Chart(document.getElementById('velocityChart'), {
+  type: 'bar',
+  data: {
+    labels: sellingWallets.map(w => w.short_addr),
+    datasets: [{
+      label: 'XPL/day',
+      data: sellingWallets.map(w => w.velocity),
+      backgroundColor: sellingWallets.map(w => BEHAVIOR_COLORS[w.behavior] || '#a78bfa'),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, indexAxis: 'y',
+    scales: {
+      x: { ticks: { color: '#94a3b8', callback: v => fmtK(v) }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmt(ctx.raw) + ' XPL/day (' + ctx.label + ')' } }
+    }
+  }
+});
+
+// ── Time to First Sell ──
+const sellTimingWallets = DATA.wallets.filter(w => w.unlock_date && w.first_sell_date);
+function hoursGap(d1, d2) {
+  return (new Date(d2) - new Date(d1)) / 3600000;
+}
+const ttfs = sellTimingWallets.map(w => ({
+  addr: w.short_addr, hours: hoursGap(w.unlock_date, w.first_sell_date),
+  behavior: w.behavior, received: w.received
+})).sort((a,b) => a.hours - b.hours).slice(0, 15);
+
+new Chart(document.getElementById('timeToSellChart'), {
+  type: 'bar',
+  data: {
+    labels: ttfs.map(t => t.addr),
+    datasets: [{
+      label: 'Hours to First Sell',
+      data: ttfs.map(t => Math.round(t.hours * 10) / 10),
+      backgroundColor: ttfs.map(t => BEHAVIOR_COLORS[t.behavior] || '#a78bfa'),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'Hours', color: '#94a3b8' } },
+      x: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw + ' hours after unlock (' + fmt(ttfs[ctx.dataIndex].received) + ' XPL received)' } }
     }
   }
 });
@@ -860,7 +1383,7 @@ const svr_wallets = DATA.top_wallets.slice(0, 15);
 new Chart(document.getElementById('soldRemainingChart'), {
   type: 'bar',
   data: {
-    labels: svr_wallets.map(w => w.short_addr),
+    labels: svr_wallets.map(w => w.label ? w.short_addr + ' (' + w.label + ')' : w.short_addr),
     datasets: [
       { label: 'Sold', data: svr_wallets.map(w => w.sold), backgroundColor: '#f87171', borderRadius: 4 },
       { label: 'Remaining', data: svr_wallets.map(w => w.remaining), backgroundColor: '#34d399', borderRadius: 4 },
@@ -869,7 +1392,7 @@ new Chart(document.getElementById('soldRemainingChart'), {
   options: {
     responsive: true,
     scales: {
-      x: { stacked: true, ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 10 } }, grid: { display: false } },
+      x: { stacked: true, ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } },
       y: { stacked: true, ticks: { color: '#94a3b8', callback: v => fmtK(v) }, grid: { color: 'rgba(255,255,255,0.05)' } }
     },
     plugins: {
@@ -881,15 +1404,21 @@ new Chart(document.getElementById('soldRemainingChart'), {
 
 // ── Sortable Table ──
 const columns = [
-  { key: 'rank', label: '#', cls: 'num', sortType: 'num' },
-  { key: 'address', label: 'Address', cls: 'addr', sortType: 'str' },
-  { key: 'received', label: 'Received (XPL)', cls: 'num', sortType: 'num' },
-  { key: 'balance', label: 'Current Balance', cls: 'num', sortType: 'num' },
-  { key: 'sold', label: 'Sold (XPL)', cls: 'num', sortType: 'num' },
-  { key: 'pct_sold', label: '% Sold', cls: '', sortType: 'num' },
-  { key: 'remaining', label: 'Remaining', cls: 'num', sortType: 'num' },
-  { key: 'behavior', label: 'Behavior', cls: '', sortType: 'str' },
-  { key: 'source', label: 'Source', cls: '', sortType: 'str' },
+  { key: 'rank', label: '#', sortType: 'num' },
+  { key: 'address', label: 'Address', sortType: 'str' },
+  { key: 'label', label: 'Label', sortType: 'str' },
+  { key: 'received', label: 'Received', sortType: 'num' },
+  { key: 'sold', label: 'Sold', sortType: 'num' },
+  { key: 'pct_sold', label: '% Sold', sortType: 'num' },
+  { key: 'remaining', label: 'Remaining', sortType: 'num' },
+  { key: 'behavior', label: 'Behavior', sortType: 'str' },
+  { key: 'unlock_date', label: 'Unlock Date', sortType: 'str' },
+  { key: 'first_sell_date', label: 'First Sell', sortType: 'str' },
+  { key: 'last_activity', label: 'Last Activity', sortType: 'str' },
+  { key: 'num_sell_txs', label: '# Txs', sortType: 'num' },
+  { key: 'velocity', label: 'Velocity', sortType: 'num' },
+  { key: 'days_selling', label: 'Days Active', sortType: 'num' },
+  { key: 'source', label: 'Source', sortType: 'str' },
 ];
 
 let sortCol = 'rank', sortDir = 1;
@@ -912,12 +1441,17 @@ function renderTable() {
   let rows = [...DATA.wallets];
   if (filterText) {
     const q = filterText.toLowerCase();
-    rows = rows.filter(r => r.address.toLowerCase().includes(q) || r.behavior.toLowerCase().includes(q) || r.behavior_label.toLowerCase().includes(q));
+    rows = rows.filter(r =>
+      r.address.toLowerCase().includes(q) ||
+      r.behavior_label.toLowerCase().includes(q) ||
+      (r.label || '').toLowerCase().includes(q) ||
+      (r.source || '').toLowerCase().includes(q)
+    );
   }
   const col = columns.find(c => c.key === sortCol);
   rows.sort((a, b) => {
-    let va = a[sortCol], vb = b[sortCol];
-    if (col && col.sortType === 'num') return (va - vb) * sortDir;
+    let va = a[sortCol] ?? '', vb = b[sortCol] ?? '';
+    if (col && col.sortType === 'num') return ((+va || 0) - (+vb || 0)) * sortDir;
     return String(va).localeCompare(String(vb)) * sortDir;
   });
   const tbody = document.getElementById('tableBody');
@@ -926,16 +1460,23 @@ function renderTable() {
     const tr = document.createElement('tr');
     const barColor = BEHAVIOR_COLORS[r.behavior] || '#a78bfa';
     const barPct = Math.min(r.pct_sold, 100);
+    const labelHtml = r.label ? `<span class="lbl">${r.label}</span>` : '';
     tr.innerHTML =
       `<td class="num">${r.rank}</td>` +
-      `<td class="addr">${r.address}</td>` +
+      `<td class="addr">${r.short_addr}</td>` +
+      `<td>${r.label || '<span class="dim">-</span>'}</td>` +
       `<td class="num">${fmt(r.received)}</td>` +
-      `<td class="num">${fmt(r.balance)}</td>` +
       `<td class="num">${fmt(r.sold)}</td>` +
       `<td><div class="sold-bar"><div class="sold-bar-fill" style="width:${barPct}%;background:${barColor}"></div></div> ${r.pct_sold}%</td>` +
       `<td class="num">${fmt(r.remaining)}</td>` +
       `<td><span class="badge ${r.behavior}">${r.behavior_label}</span></td>` +
-      `<td style="color:var(--muted);font-size:12px">${r.source}</td>`;
+      `<td class="mono dim">${fmtDate(r.unlock_date)}</td>` +
+      `<td class="mono dim">${fmtDate(r.first_sell_date)}</td>` +
+      `<td class="mono dim">${fmtDate(r.last_activity)}</td>` +
+      `<td class="num">${r.num_sell_txs || '-'}</td>` +
+      `<td class="num" style="color:${r.velocity > 0 ? 'var(--red)' : 'var(--muted)'}">${r.velocity > 0 ? fmtK(r.velocity) + '/d' : '-'}</td>` +
+      `<td class="num">${r.days_selling > 0 ? r.days_selling + 'd' : '-'}</td>` +
+      `<td class="dim" style="font-size:10px">${r.source}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -946,16 +1487,17 @@ renderTable();
 // ── Sources ──
 const sourcesList = document.getElementById('sourcesList');
 const sources = [
-  { name: 'Plasma RPC', url: 'https://rpc.plasma.to', desc: 'Primary blockchain data — block scanning, balance queries, transaction history' },
-  { name: 'PlasmaScan API', url: 'https://plasmascan.to/api', desc: 'Etherscan-compatible API for indexed transaction lookups by address' },
-  { name: 'Arkham Intelligence', url: 'https://api.arkhamintelligence.com', desc: 'Entity labeling, wallet identification, and on-chain analytics' },
-  { name: 'XPL Token Contract', url: '0x405fbc9004d857903bfd6b3357792d71a50726b0', desc: 'XPL token on Plasma mainnet (ERC-20 compatible)' },
+  { name: 'Plasma RPC', url: 'https://rpc.plasma.to', desc: 'Primary blockchain data. Block scanning identifies unlock transactions by value threshold. Balance queries (eth_getBalance) track current holdings for sell pressure calculation.' },
+  { name: 'PlasmaScan API', url: 'https://plasmascan.to/api', desc: 'Etherscan-compatible indexed API. Transaction history lookups by address for vesting contract outflows, transfer timestamps, and sell transaction counts.' },
+  { name: 'Arkham Intelligence', url: 'https://api.arkhamintelligence.com', desc: 'Entity labeling engine. Maps on-chain addresses to known entities (Plasma Foundation, Ecosystem Fund, Early Investors, etc.). Used for wallet identification and attribution.' },
+  { name: 'XPL Token Contract', url: '0x405fbc9004d857903bfd6b3357792d71a50726b0', desc: 'XPL ERC-20 token on Plasma mainnet. Transfer events parsed to track token movements from vesting contracts to recipient wallets.' },
+  { name: 'Classification', url: 'Statistical (MAD)', desc: 'Wallets classified as "large" using Median Absolute Deviation with threshold 2.0 (cutoff: ' + fmt(DATA.stats.cutoff_xpl || 0) + ' XPL). Behavior: Heavy (>=75% sold), Moderate (40-75%), Light (10-40%), Holder (<10%).' },
+  { name: 'Timing', url: 'On-chain timestamps', desc: 'Unlock dates from block timestamps of the distribution transaction. First sell / last activity from outbound transaction history. Velocity = total sold / days since first sell.' },
 ];
 sources.forEach(s => {
   sourcesList.innerHTML += `<div class="source-item"><div class="source-name">${s.name}</div><div><div class="source-url">${s.url}</div><div class="source-desc">${s.desc}</div></div></div>`;
 });
 
-// ── Footer ──
 document.getElementById('footer').textContent = `XPL Wallet Unlock Dashboard — Generated ${DATA.generated} — Plasma Chain ID 9745`;
 </script>
 </body>

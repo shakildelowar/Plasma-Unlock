@@ -4,8 +4,9 @@ Produces a single self-contained .html file with:
   - KPI cards (total unlocked, sold, remaining, large wallet count)
   - Doughnut chart for selling behavior distribution
   - Bar chart for top wallets by amount received
+  - Sell velocity scatter chart (XPL/day vs amount received)
   - Horizontal bar for sold vs remaining per wallet
-  - Sortable, searchable data table
+  - Sortable, searchable data table with timing details
   - Data sources section
   - All powered by Chart.js (loaded from CDN) with no other dependencies
 """
@@ -26,17 +27,6 @@ def generate_dashboard(
 ) -> str:
     """
     Write an interactive HTML dashboard and return the output path.
-
-    Parameters
-    ----------
-    tracking_df : DataFrame
-        Large wallets with selling metrics.
-    stats : dict
-        Classification statistics.
-    all_wallets_df : DataFrame, optional
-        Full wallet list (large + small).
-    output_path : str
-    run_config : dict, optional
     """
     # Prepare data for JS
     if tracking_df.empty:
@@ -56,6 +46,17 @@ def generate_dashboard(
                 "behavior": r.get("behavior", "unknown"),
                 "behavior_label": r.get("behavior", "unknown").replace("_", " ").title(),
                 "source": r.get("source", "Plasma RPC / PlasmaScan"),
+                # Timing fields
+                "unlock_date": r.get("unlock_date", None),
+                "unlock_block": int(r["unlock_block"]) if r.get("unlock_block") else None,
+                "unlock_tx": r.get("unlock_tx_hash", None),
+                "first_sell_date": r.get("first_sell_date", None),
+                "last_activity": r.get("last_activity_date", None),
+                "num_sell_txs": int(r["num_sell_txs"]) if r.get("num_sell_txs") else 0,
+                "velocity": round(r["sell_velocity_per_day"], 2) if r.get("sell_velocity_per_day") else 0,
+                "days_since_unlock": round(r["days_since_unlock"], 1) if r.get("days_since_unlock") else 0,
+                "days_selling": round(r["days_active_selling"], 1) if r.get("days_active_selling") else 0,
+                "label": r.get("label", None),
             })
 
     total_recv = sum(w["received"] for w in wallet_rows)
@@ -85,7 +86,19 @@ def generate_dashboard(
         "generated": datetime.utcnow().strftime("%Y-%m-%d %H:%M UTC"),
     }, indent=2)
 
-    page_html = _TEMPLATE.replace("/* __DATA__ */", f"const DATA = {js_data};")
+    rpc_url = config.RPC_URL
+    plasmascan_url = config.PLASMASCAN_API_URL
+    arkham_url = config.ARKHAM_API_URL
+    xpl_contract = config.XPL_CONTRACT
+    chain_id = config.CHAIN_ID
+
+    page_html = _TEMPLATE
+    page_html = page_html.replace("/* __DATA__ */", f"const DATA = {js_data};")
+    page_html = page_html.replace("__RPC_URL__", rpc_url)
+    page_html = page_html.replace("__PLASMASCAN_URL__", plasmascan_url)
+    page_html = page_html.replace("__ARKHAM_URL__", arkham_url)
+    page_html = page_html.replace("__XPL_CONTRACT__", xpl_contract)
+    page_html = page_html.replace("__CHAIN_ID__", str(chain_id))
 
     with open(output_path, "w") as f:
         f.write(page_html)
@@ -123,83 +136,83 @@ _TEMPLATE = r"""<!DOCTYPE html>
   .header h1 span { color: var(--accent); }
   .header .meta { color: var(--muted); font-size: 13px; margin-top: 6px; }
 
-  /* KPI cards */
-  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 28px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 28px; }
   .kpi {
     background: var(--surface); border-radius: 12px; padding: 20px;
     border: 1px solid var(--surface2); text-align: center;
   }
-  .kpi .label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
-  .kpi .value { font-size: 28px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
-  .kpi .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .kpi .label { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); }
+  .kpi .value { font-size: 26px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .kpi .sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
   .kpi.green .value { color: var(--green); }
   .kpi.red .value { color: var(--red); }
   .kpi.blue .value { color: var(--accent); }
   .kpi.amber .value { color: var(--amber); }
+  .kpi.purple .value { color: var(--purple); }
 
-  /* Charts */
   .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
   @media (max-width: 900px) { .charts { grid-template-columns: 1fr; } }
   .chart-card {
     background: var(--surface); border-radius: 12px; padding: 20px;
     border: 1px solid var(--surface2);
   }
-  .chart-card h3 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
+  .chart-card h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; }
   .chart-wrap { position: relative; width: 100%; }
 
-  /* Table */
   .table-section {
     background: var(--surface); border-radius: 12px; padding: 20px;
     border: 1px solid var(--surface2); margin-bottom: 28px; overflow-x: auto;
   }
   .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
-  .table-header h3 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .table-header h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
   .search-box {
     background: var(--surface2); border: 1px solid #475569; border-radius: 8px;
-    padding: 8px 14px; color: var(--text); font-size: 13px; width: 280px;
+    padding: 8px 14px; color: var(--text); font-size: 13px; width: 300px;
     outline: none; transition: border-color 0.2s;
   }
   .search-box:focus { border-color: var(--accent); }
 
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
   th {
-    text-align: left; padding: 10px 12px; font-weight: 600; color: var(--muted);
+    text-align: left; padding: 8px 10px; font-weight: 600; color: var(--muted);
     border-bottom: 2px solid var(--surface2); cursor: pointer; white-space: nowrap;
-    user-select: none; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;
+    user-select: none; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
   }
   th:hover { color: var(--accent); }
-  th .arrow { font-size: 10px; margin-left: 4px; }
+  th .arrow { font-size: 9px; margin-left: 3px; }
   td {
-    padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.05);
     white-space: nowrap;
   }
   tr:hover td { background: rgba(56, 189, 248, 0.04); }
-  .addr { font-family: 'Consolas', 'Monaco', monospace; font-size: 12px; color: var(--accent); }
-  .num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'Consolas', monospace; font-size: 12px; }
+  .mono { font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; }
+  .addr { font-family: 'Consolas', 'Monaco', monospace; font-size: 11px; color: var(--accent); }
+  .num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'Consolas', monospace; font-size: 11px; }
+  .dim { color: var(--muted); font-size: 11px; }
   .badge {
-    display: inline-block; padding: 2px 10px; border-radius: 9999px;
-    font-size: 11px; font-weight: 600; text-transform: capitalize;
+    display: inline-block; padding: 2px 8px; border-radius: 9999px;
+    font-size: 10px; font-weight: 600; text-transform: capitalize;
   }
   .badge.heavy_seller { background: rgba(248,113,113,0.2); color: var(--red); }
   .badge.moderate_seller { background: rgba(251,191,36,0.2); color: var(--amber); }
   .badge.light_seller { background: rgba(96,165,250,0.2); color: var(--blue); }
   .badge.holder { background: rgba(52,211,153,0.2); color: var(--green); }
 
-  /* Sold bar */
-  .sold-bar { width: 100px; height: 8px; background: var(--surface2); border-radius: 4px; display: inline-block; vertical-align: middle; }
-  .sold-bar-fill { height: 100%; border-radius: 4px; }
+  .sold-bar { width: 80px; height: 6px; background: var(--surface2); border-radius: 3px; display: inline-block; vertical-align: middle; }
+  .sold-bar-fill { height: 100%; border-radius: 3px; }
 
-  /* Sources */
+  .lbl { display: inline-block; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 600; background: rgba(167,139,250,0.15); color: var(--purple); margin-left: 4px; }
+
   .sources {
     background: var(--surface); border-radius: 12px; padding: 20px;
     border: 1px solid var(--surface2);
   }
-  .sources h3 { font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .sources h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
   .source-item { display: flex; gap: 16px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.05); }
   .source-item:last-child { border: none; }
-  .source-name { font-weight: 600; min-width: 160px; color: var(--accent); }
-  .source-url { font-family: monospace; font-size: 12px; color: var(--muted); word-break: break-all; }
-  .source-desc { font-size: 13px; color: var(--text); }
+  .source-name { font-weight: 600; min-width: 140px; color: var(--accent); font-size: 13px; }
+  .source-url { font-family: monospace; font-size: 11px; color: var(--muted); word-break: break-all; }
+  .source-desc { font-size: 12px; color: var(--text); }
 
   .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 32px; }
 </style>
@@ -219,19 +232,27 @@ _TEMPLATE = r"""<!DOCTYPE html>
     <div class="chart-wrap"><canvas id="behaviorChart"></canvas></div>
   </div>
   <div class="chart-card">
-    <h3>Top Wallets — Amount Received (XPL)</h3>
+    <h3>Top Wallets - Amount Received (XPL)</h3>
     <div class="chart-wrap"><canvas id="topWalletsChart"></canvas></div>
   </div>
+  <div class="chart-card">
+    <h3>Sell Velocity - XPL Sold Per Day</h3>
+    <div class="chart-wrap"><canvas id="velocityChart"></canvas></div>
+  </div>
+  <div class="chart-card">
+    <h3>Time to First Sell (Hours After Unlock)</h3>
+    <div class="chart-wrap"><canvas id="timeToSellChart"></canvas></div>
+  </div>
   <div class="chart-card" style="grid-column: 1 / -1;">
-    <h3>Sold vs Remaining — Large Wallets</h3>
+    <h3>Sold vs Remaining - Large Wallets</h3>
     <div class="chart-wrap"><canvas id="soldRemainingChart"></canvas></div>
   </div>
 </div>
 
 <div class="table-section">
   <div class="table-header">
-    <h3>Large Wallet Details</h3>
-    <input type="text" class="search-box" id="searchBox" placeholder="Search address or behavior...">
+    <h3>Large Wallet Details - Full Breakdown with Timing</h3>
+    <input type="text" class="search-box" id="searchBox" placeholder="Search address, behavior, label, or source...">
   </div>
   <table>
     <thead><tr id="tableHead"></tr></thead>
@@ -249,19 +270,18 @@ _TEMPLATE = r"""<!DOCTYPE html>
 <script>
 /* __DATA__ */
 
-// ── Helpers ──
 const fmt = (n) => n.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2});
 const fmtK = (n) => {
   if (n >= 1e6) return (n/1e6).toFixed(1) + 'M';
   if (n >= 1e3) return (n/1e3).toFixed(0) + 'K';
   return n.toFixed(0);
 };
+const fmtDate = (d) => d ? d.replace(' UTC','') : '-';
+const fmtVel = (v) => v > 0 ? fmtK(v) + '/day' : '-';
 
 const BEHAVIOR_COLORS = {
-  heavy_seller: '#f87171',
-  moderate_seller: '#fbbf24',
-  light_seller: '#60a5fa',
-  holder: '#34d399',
+  heavy_seller: '#f87171', moderate_seller: '#fbbf24',
+  light_seller: '#60a5fa', holder: '#34d399',
 };
 
 // ── Meta ──
@@ -272,12 +292,18 @@ document.getElementById('meta').innerHTML =
   `Cutoff: <strong>${fmt(DATA.stats.cutoff_xpl || 0)} XPL</strong>`;
 
 // ── KPIs ──
+const avgVelocity = DATA.wallets.filter(w => w.velocity > 0).reduce((s,w) => s + w.velocity, 0) / Math.max(1, DATA.wallets.filter(w => w.velocity > 0).length);
+const avgDaysSelling = DATA.wallets.filter(w => w.days_selling > 0).reduce((s,w) => s + w.days_selling, 0) / Math.max(1, DATA.wallets.filter(w => w.days_selling > 0).length);
+const totalSellTxs = DATA.wallets.reduce((s,w) => s + (w.num_sell_txs || 0), 0);
+
 const kpiDiv = document.getElementById('kpis');
 const kpis = [
   { label: 'Total XPL Unlocked', value: fmtK(DATA.totals.received), sub: `across ${DATA.wallets.length} large wallets`, cls: 'blue' },
   { label: 'Total XPL Sold', value: fmtK(DATA.totals.sold), sub: `${DATA.totals.pct_sold}% of received`, cls: 'red' },
-  { label: 'Total XPL Remaining', value: fmtK(DATA.totals.remaining), sub: 'still held in wallets', cls: 'green' },
+  { label: 'Total XPL Remaining', value: fmtK(DATA.totals.remaining), sub: 'potential sell pressure', cls: 'green' },
   { label: 'Large Wallets', value: DATA.stats.n_large || 0, sub: `of ${DATA.stats.n_total || 0} total (${DATA.stats.pct_large || 0}%)`, cls: 'amber' },
+  { label: 'Avg Sell Velocity', value: fmtK(avgVelocity), sub: 'XPL/day (selling wallets)', cls: 'red' },
+  { label: 'Total Sell Txs', value: totalSellTxs.toLocaleString(), sub: `avg ${Math.round(avgDaysSelling)} days active`, cls: 'purple' },
 ];
 kpis.forEach(k => {
   kpiDiv.innerHTML += `<div class="kpi ${k.cls}"><div class="label">${k.label}</div><div class="value">${k.value}</div><div class="sub">${k.sub}</div></div>`;
@@ -297,7 +323,7 @@ new Chart(document.getElementById('behaviorChart'), {
   options: {
     responsive: true,
     plugins: {
-      legend: { position: 'right', labels: { color: '#f1f5f9', padding: 16, font: { size: 12 } } }
+      legend: { position: 'right', labels: { color: '#f1f5f9', padding: 14, font: { size: 11 } } }
     }
   }
 });
@@ -306,7 +332,7 @@ new Chart(document.getElementById('behaviorChart'), {
 new Chart(document.getElementById('topWalletsChart'), {
   type: 'bar',
   data: {
-    labels: DATA.top_wallets.map(w => w.short_addr),
+    labels: DATA.top_wallets.map(w => w.label ? w.short_addr + ' (' + w.label + ')' : w.short_addr),
     datasets: [{
       label: 'Received (XPL)',
       data: DATA.top_wallets.map(w => w.received),
@@ -318,11 +344,71 @@ new Chart(document.getElementById('topWalletsChart'), {
     responsive: true, indexAxis: 'y',
     scales: {
       x: { ticks: { color: '#94a3b8', callback: v => fmtK(v) }, grid: { color: 'rgba(255,255,255,0.05)' } },
-      y: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 10 } }, grid: { display: false } }
+      y: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } }
     },
     plugins: {
       legend: { display: false },
       tooltip: { callbacks: { label: ctx => fmt(ctx.raw) + ' XPL' } }
+    }
+  }
+});
+
+// ── Sell Velocity Chart ──
+const sellingWallets = DATA.wallets.filter(w => w.velocity > 0).sort((a,b) => b.velocity - a.velocity).slice(0, 15);
+new Chart(document.getElementById('velocityChart'), {
+  type: 'bar',
+  data: {
+    labels: sellingWallets.map(w => w.short_addr),
+    datasets: [{
+      label: 'XPL/day',
+      data: sellingWallets.map(w => w.velocity),
+      backgroundColor: sellingWallets.map(w => BEHAVIOR_COLORS[w.behavior] || '#a78bfa'),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, indexAxis: 'y',
+    scales: {
+      x: { ticks: { color: '#94a3b8', callback: v => fmtK(v) }, grid: { color: 'rgba(255,255,255,0.05)' } },
+      y: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => fmt(ctx.raw) + ' XPL/day (' + ctx.label + ')' } }
+    }
+  }
+});
+
+// ── Time to First Sell ──
+const sellTimingWallets = DATA.wallets.filter(w => w.unlock_date && w.first_sell_date);
+function hoursGap(d1, d2) {
+  return (new Date(d2) - new Date(d1)) / 3600000;
+}
+const ttfs = sellTimingWallets.map(w => ({
+  addr: w.short_addr, hours: hoursGap(w.unlock_date, w.first_sell_date),
+  behavior: w.behavior, received: w.received
+})).sort((a,b) => a.hours - b.hours).slice(0, 15);
+
+new Chart(document.getElementById('timeToSellChart'), {
+  type: 'bar',
+  data: {
+    labels: ttfs.map(t => t.addr),
+    datasets: [{
+      label: 'Hours to First Sell',
+      data: ttfs.map(t => Math.round(t.hours * 10) / 10),
+      backgroundColor: ttfs.map(t => BEHAVIOR_COLORS[t.behavior] || '#a78bfa'),
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    scales: {
+      y: { ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' }, title: { display: true, text: 'Hours', color: '#94a3b8' } },
+      x: { ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } }
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ctx.raw + ' hours after unlock (' + fmt(ttfs[ctx.dataIndex].received) + ' XPL received)' } }
     }
   }
 });
@@ -332,7 +418,7 @@ const svr_wallets = DATA.top_wallets.slice(0, 15);
 new Chart(document.getElementById('soldRemainingChart'), {
   type: 'bar',
   data: {
-    labels: svr_wallets.map(w => w.short_addr),
+    labels: svr_wallets.map(w => w.label ? w.short_addr + ' (' + w.label + ')' : w.short_addr),
     datasets: [
       { label: 'Sold', data: svr_wallets.map(w => w.sold), backgroundColor: '#f87171', borderRadius: 4 },
       { label: 'Remaining', data: svr_wallets.map(w => w.remaining), backgroundColor: '#34d399', borderRadius: 4 },
@@ -341,7 +427,7 @@ new Chart(document.getElementById('soldRemainingChart'), {
   options: {
     responsive: true,
     scales: {
-      x: { stacked: true, ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 10 } }, grid: { display: false } },
+      x: { stacked: true, ticks: { color: '#94a3b8', font: { family: 'Consolas', size: 9 } }, grid: { display: false } },
       y: { stacked: true, ticks: { color: '#94a3b8', callback: v => fmtK(v) }, grid: { color: 'rgba(255,255,255,0.05)' } }
     },
     plugins: {
@@ -353,15 +439,21 @@ new Chart(document.getElementById('soldRemainingChart'), {
 
 // ── Sortable Table ──
 const columns = [
-  { key: 'rank', label: '#', cls: 'num', sortType: 'num' },
-  { key: 'address', label: 'Address', cls: 'addr', sortType: 'str' },
-  { key: 'received', label: 'Received (XPL)', cls: 'num', sortType: 'num' },
-  { key: 'balance', label: 'Current Balance', cls: 'num', sortType: 'num' },
-  { key: 'sold', label: 'Sold (XPL)', cls: 'num', sortType: 'num' },
-  { key: 'pct_sold', label: '% Sold', cls: '', sortType: 'num' },
-  { key: 'remaining', label: 'Remaining', cls: 'num', sortType: 'num' },
-  { key: 'behavior', label: 'Behavior', cls: '', sortType: 'str' },
-  { key: 'source', label: 'Source', cls: '', sortType: 'str' },
+  { key: 'rank', label: '#', sortType: 'num' },
+  { key: 'address', label: 'Address', sortType: 'str' },
+  { key: 'label', label: 'Label', sortType: 'str' },
+  { key: 'received', label: 'Received', sortType: 'num' },
+  { key: 'sold', label: 'Sold', sortType: 'num' },
+  { key: 'pct_sold', label: '% Sold', sortType: 'num' },
+  { key: 'remaining', label: 'Remaining', sortType: 'num' },
+  { key: 'behavior', label: 'Behavior', sortType: 'str' },
+  { key: 'unlock_date', label: 'Unlock Date', sortType: 'str' },
+  { key: 'first_sell_date', label: 'First Sell', sortType: 'str' },
+  { key: 'last_activity', label: 'Last Activity', sortType: 'str' },
+  { key: 'num_sell_txs', label: '# Txs', sortType: 'num' },
+  { key: 'velocity', label: 'Velocity', sortType: 'num' },
+  { key: 'days_selling', label: 'Days Active', sortType: 'num' },
+  { key: 'source', label: 'Source', sortType: 'str' },
 ];
 
 let sortCol = 'rank', sortDir = 1;
@@ -384,12 +476,17 @@ function renderTable() {
   let rows = [...DATA.wallets];
   if (filterText) {
     const q = filterText.toLowerCase();
-    rows = rows.filter(r => r.address.toLowerCase().includes(q) || r.behavior.toLowerCase().includes(q) || r.behavior_label.toLowerCase().includes(q));
+    rows = rows.filter(r =>
+      r.address.toLowerCase().includes(q) ||
+      r.behavior_label.toLowerCase().includes(q) ||
+      (r.label || '').toLowerCase().includes(q) ||
+      (r.source || '').toLowerCase().includes(q)
+    );
   }
   const col = columns.find(c => c.key === sortCol);
   rows.sort((a, b) => {
-    let va = a[sortCol], vb = b[sortCol];
-    if (col && col.sortType === 'num') return (va - vb) * sortDir;
+    let va = a[sortCol] ?? '', vb = b[sortCol] ?? '';
+    if (col && col.sortType === 'num') return ((+va || 0) - (+vb || 0)) * sortDir;
     return String(va).localeCompare(String(vb)) * sortDir;
   });
   const tbody = document.getElementById('tableBody');
@@ -398,16 +495,23 @@ function renderTable() {
     const tr = document.createElement('tr');
     const barColor = BEHAVIOR_COLORS[r.behavior] || '#a78bfa';
     const barPct = Math.min(r.pct_sold, 100);
+    const labelHtml = r.label ? `<span class="lbl">${r.label}</span>` : '';
     tr.innerHTML =
       `<td class="num">${r.rank}</td>` +
-      `<td class="addr">${r.address}</td>` +
+      `<td class="addr">${r.short_addr}</td>` +
+      `<td>${r.label || '<span class="dim">-</span>'}</td>` +
       `<td class="num">${fmt(r.received)}</td>` +
-      `<td class="num">${fmt(r.balance)}</td>` +
       `<td class="num">${fmt(r.sold)}</td>` +
       `<td><div class="sold-bar"><div class="sold-bar-fill" style="width:${barPct}%;background:${barColor}"></div></div> ${r.pct_sold}%</td>` +
       `<td class="num">${fmt(r.remaining)}</td>` +
       `<td><span class="badge ${r.behavior}">${r.behavior_label}</span></td>` +
-      `<td style="color:var(--muted);font-size:12px">${r.source}</td>`;
+      `<td class="mono dim">${fmtDate(r.unlock_date)}</td>` +
+      `<td class="mono dim">${fmtDate(r.first_sell_date)}</td>` +
+      `<td class="mono dim">${fmtDate(r.last_activity)}</td>` +
+      `<td class="num">${r.num_sell_txs || '-'}</td>` +
+      `<td class="num" style="color:${r.velocity > 0 ? 'var(--red)' : 'var(--muted)'}">${r.velocity > 0 ? fmtK(r.velocity) + '/d' : '-'}</td>` +
+      `<td class="num">${r.days_selling > 0 ? r.days_selling + 'd' : '-'}</td>` +
+      `<td class="dim" style="font-size:10px">${r.source}</td>`;
     tbody.appendChild(tr);
   });
 }
@@ -418,17 +522,18 @@ renderTable();
 // ── Sources ──
 const sourcesList = document.getElementById('sourcesList');
 const sources = [
-  { name: 'Plasma RPC', url: '""" + config.RPC_URL + """', desc: 'Primary blockchain data — block scanning, balance queries, transaction history' },
-  { name: 'PlasmaScan API', url: '""" + config.PLASMASCAN_API_URL + """', desc: 'Etherscan-compatible API for indexed transaction lookups by address' },
-  { name: 'Arkham Intelligence', url: '""" + config.ARKHAM_API_URL + """', desc: 'Entity labeling, wallet identification, and on-chain analytics' },
-  { name: 'XPL Token Contract', url: '""" + config.XPL_CONTRACT + """', desc: 'XPL token on Plasma mainnet (ERC-20 compatible)' },
+  { name: 'Plasma RPC', url: '__RPC_URL__', desc: 'Primary blockchain data. Block scanning identifies unlock transactions by value threshold. Balance queries (eth_getBalance) track current holdings for sell pressure calculation.' },
+  { name: 'PlasmaScan API', url: '__PLASMASCAN_URL__', desc: 'Etherscan-compatible indexed API. Transaction history lookups by address for vesting contract outflows, transfer timestamps, and sell transaction counts.' },
+  { name: 'Arkham Intelligence', url: '__ARKHAM_URL__', desc: 'Entity labeling engine. Maps on-chain addresses to known entities (Plasma Foundation, Ecosystem Fund, Early Investors, etc.). Used for wallet identification and attribution.' },
+  { name: 'XPL Token Contract', url: '__XPL_CONTRACT__', desc: 'XPL ERC-20 token on Plasma mainnet. Transfer events parsed to track token movements from vesting contracts to recipient wallets.' },
+  { name: 'Classification', url: 'Statistical (MAD)', desc: 'Wallets classified as "large" using Median Absolute Deviation with threshold 2.0 (cutoff: ' + fmt(DATA.stats.cutoff_xpl || 0) + ' XPL). Behavior: Heavy (>=75% sold), Moderate (40-75%), Light (10-40%), Holder (<10%).' },
+  { name: 'Timing', url: 'On-chain timestamps', desc: 'Unlock dates from block timestamps of the distribution transaction. First sell / last activity from outbound transaction history. Velocity = total sold / days since first sell.' },
 ];
 sources.forEach(s => {
   sourcesList.innerHTML += `<div class="source-item"><div class="source-name">${s.name}</div><div><div class="source-url">${s.url}</div><div class="source-desc">${s.desc}</div></div></div>`;
 });
 
-// ── Footer ──
-document.getElementById('footer').textContent = `XPL Wallet Unlock Dashboard — Generated ${DATA.generated} — Plasma Chain ID """ + str(config.CHAIN_ID) + """`;
+document.getElementById('footer').textContent = `XPL Wallet Unlock Dashboard — Generated ${DATA.generated} — Plasma Chain ID __CHAIN_ID__`;
 </script>
 </body>
 </html>"""

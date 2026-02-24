@@ -10,6 +10,7 @@ Usage
 
 import random
 import hashlib
+from datetime import datetime, timedelta
 
 
 def _make_addr(seed):
@@ -119,6 +120,113 @@ def generate_sample_balances(wallet_amounts, seed=42):
         balances[addr] = round(received * pct_remaining, 2)
 
     return balances
+
+
+def generate_sample_timing(wallet_amounts, wallet_balances, seed=42):
+    """
+    Generate timing data for each wallet's unlock and selling activity.
+
+    Returns dict of {address: timing_dict} where timing_dict has:
+      - unlock_date: when the wallet received the unlock
+      - unlock_block: block number of the unlock tx
+      - unlock_tx_hash: transaction hash of the unlock
+      - first_sell_date: when the wallet first sold (None if holder)
+      - last_activity_date: most recent outbound transaction
+      - num_sell_txs: number of individual sell transactions
+      - sell_velocity_per_day: average XPL sold per day since first sell
+      - days_since_unlock: days between unlock and now
+      - days_active_selling: days between first sell and last activity
+      - source: data source attribution
+    """
+    rng = random.Random(seed + 2)
+    timing = {}
+
+    # The main ecosystem unlock event was around Jan 25, 2026
+    # But wallets received at slightly different times (batched distribution)
+    unlock_base = datetime(2026, 1, 25, 14, 0, 0)
+    now = datetime(2026, 2, 24, 12, 0, 0)
+    base_block = 48_200_000
+
+    for addr, received in wallet_amounts.items():
+        balance = wallet_balances.get(addr, received)
+        sold = max(0, received - balance)
+        pct_sold = (sold / received * 100) if received > 0 else 0
+
+        # Unlock happened in a ~3 day window (Jan 24-27)
+        unlock_offset_hours = rng.uniform(-24, 48)
+        unlock_dt = unlock_base + timedelta(hours=unlock_offset_hours)
+        block_offset = int(unlock_offset_hours * 3600 / 2)  # ~2s blocks
+        unlock_block = base_block + block_offset
+
+        tx_hash = "0x" + hashlib.sha256(
+            f"unlock_{addr}_{seed}".encode()
+        ).hexdigest()
+
+        days_since = (now - unlock_dt).total_seconds() / 86400
+
+        # Determine selling timeline based on behavior
+        first_sell_date = None
+        last_activity = unlock_dt
+        num_sell_txs = 0
+        sell_velocity = 0.0
+        days_selling = 0
+
+        if pct_sold >= 75:
+            # Heavy seller: started selling within hours, many txs
+            delay_hours = rng.uniform(0.5, 12)
+            first_sell_date = unlock_dt + timedelta(hours=delay_hours)
+            # Still selling recently
+            last_activity = now - timedelta(hours=rng.uniform(1, 48))
+            num_sell_txs = rng.randint(15, 45)
+            days_selling = (last_activity - first_sell_date).total_seconds() / 86400
+            sell_velocity = sold / max(days_selling, 0.5)
+        elif pct_sold >= 40:
+            # Moderate seller: started within a few days
+            delay_days = rng.uniform(1, 5)
+            first_sell_date = unlock_dt + timedelta(days=delay_days)
+            last_activity = now - timedelta(days=rng.uniform(0.5, 7))
+            num_sell_txs = rng.randint(8, 20)
+            days_selling = (last_activity - first_sell_date).total_seconds() / 86400
+            sell_velocity = sold / max(days_selling, 0.5)
+        elif pct_sold >= 10:
+            # Light seller: started after a week or so, sporadic
+            delay_days = rng.uniform(5, 15)
+            first_sell_date = unlock_dt + timedelta(days=delay_days)
+            last_activity = now - timedelta(days=rng.uniform(2, 14))
+            num_sell_txs = rng.randint(2, 10)
+            days_selling = (last_activity - first_sell_date).total_seconds() / 86400
+            sell_velocity = sold / max(days_selling, 0.5)
+        else:
+            # Holder: no sell activity (last activity = unlock or minor movement)
+            last_activity = unlock_dt + timedelta(hours=rng.uniform(0, 24))
+            num_sell_txs = 0
+            days_selling = 0
+            sell_velocity = 0.0
+
+        # Source attribution
+        label = get_sample_label(addr)
+        if label:
+            source = f"Arkham Intel ({label})"
+        elif received >= 1_000_000:
+            source = "PlasmaScan API + Plasma RPC"
+        else:
+            source = "Plasma RPC (block scan)"
+
+        timing[addr] = {
+            "unlock_date": unlock_dt.strftime("%Y-%m-%d %H:%M UTC"),
+            "unlock_block": unlock_block,
+            "unlock_tx_hash": tx_hash,
+            "first_sell_date": first_sell_date.strftime("%Y-%m-%d %H:%M UTC") if first_sell_date else None,
+            "last_activity_date": last_activity.strftime("%Y-%m-%d %H:%M UTC"),
+            "num_sell_txs": num_sell_txs,
+            "sell_velocity_per_day": round(sell_velocity, 2),
+            "days_since_unlock": round(days_since, 1),
+            "days_active_selling": round(days_selling, 1),
+            "label": label,
+            "source": source,
+        }
+
+    return timing
 
 
 def get_sample_label(address):

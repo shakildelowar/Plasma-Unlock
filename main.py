@@ -41,7 +41,7 @@ import config
 from fetcher import PlasmaFetcher
 from classifier import classify_wallets
 from tracker import track_selling, generate_report
-from sample_data import generate_sample_wallets, generate_sample_balances
+from sample_data import generate_sample_wallets, generate_sample_balances, generate_sample_timing
 from dashboard import generate_dashboard
 from export_excel import export_excel
 
@@ -147,9 +147,8 @@ def _run_sample(args):
 
     # Simulate current balances instead of fetching from RPC
     large = wallets_df[wallets_df["is_large"]].copy()
-    sample_balances = generate_sample_balances(
-        {r["address"]: r["amount_xpl"] for _, r in large.iterrows()}
-    )
+    large_amounts = {r["address"]: r["amount_xpl"] for _, r in large.iterrows()}
+    sample_balances = generate_sample_balances(large_amounts)
 
     large["current_balance"] = large["address"].map(sample_balances)
     large["balance_known"] = True
@@ -168,6 +167,15 @@ def _run_sample(args):
         else "light_seller" if p >= 10
         else "holder"
     )
+
+    # Generate timing data
+    timing_data = generate_sample_timing(large_amounts, sample_balances)
+    for col in ["unlock_date", "unlock_block", "unlock_tx_hash",
+                "first_sell_date", "last_activity_date", "num_sell_txs",
+                "sell_velocity_per_day", "days_since_unlock",
+                "days_active_selling", "label", "source"]:
+        large[col] = large["address"].map(lambda a, c=col: timing_data.get(a, {}).get(c))
+
     tracking_df = large.sort_values("amount_sold", ascending=False).reset_index(drop=True)
 
     # Report
