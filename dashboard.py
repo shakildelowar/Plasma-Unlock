@@ -129,27 +129,27 @@ _TEMPLATE = r"""<!DOCTYPE html>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --bg: #f0f2f8;
-    --surface: rgba(255, 255, 255, 0.55);
-    --surface-solid: #ffffff;
-    --border: rgba(255, 255, 255, 0.6);
-    --border-outer: rgba(99, 102, 241, 0.1);
-    --text: #1e1b4b;
-    --text-secondary: #4338ca;
-    --muted: #6b7280;
-    --accent: #6366f1;
-    --accent2: #8b5cf6;
-    --blue: #3b82f6;
-    --indigo: #6366f1;
-    --violet: #8b5cf6;
-    --green: #10b981;
-    --red: #ef4444;
-    --amber: #f59e0b;
-    --purple: #8b5cf6;
+    --bg: #0a0a12;
+    --surface: rgba(255, 255, 255, 0.05);
+    --surface-solid: #13131f;
+    --border: rgba(255, 255, 255, 0.08);
+    --border-outer: rgba(99, 102, 241, 0.15);
+    --text: #e8e8f0;
+    --text-secondary: #a5b4fc;
+    --muted: #7a7a9a;
+    --accent: #818cf8;
+    --accent2: #a78bfa;
+    --blue: #60a5fa;
+    --indigo: #818cf8;
+    --violet: #a78bfa;
+    --green: #34d399;
+    --red: #f87171;
+    --amber: #fbbf24;
+    --purple: #a78bfa;
     --blur: 24px;
     --radius: 20px;
-    --shadow: 0 8px 32px rgba(99, 102, 241, 0.08);
-    --shadow-lg: 0 16px 48px rgba(99, 102, 241, 0.12);
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --shadow-lg: 0 16px 48px rgba(99, 102, 241, 0.15);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
@@ -158,9 +158,9 @@ _TEMPLATE = r"""<!DOCTYPE html>
     padding: 0 24px 48px;
     min-height: 100vh;
     background-image:
-      radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.12) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 0%, rgba(139, 92, 246, 0.10) 0%, transparent 50%),
-      radial-gradient(ellipse at 50% 100%, rgba(59, 130, 246, 0.06) 0%, transparent 50%);
+      radial-gradient(ellipse at 20% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 0%, rgba(139, 92, 246, 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 100%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
     background-attachment: fixed;
   }
   .container { max-width: 1400px; margin: 0 auto; }
@@ -179,7 +179,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
     color: var(--muted); font-size: 13px; margin-top: 8px;
     font-weight: 500;
   }
-  .header .meta strong { color: var(--text-secondary); }
+  .header .meta strong { color: var(--accent); }
 
   /* Glass card base */
   .glass {
@@ -241,14 +241,14 @@ _TEMPLATE = r"""<!DOCTYPE html>
     letter-spacing: 0.8px; font-weight: 700;
   }
   .search-box {
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.06);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(99, 102, 241, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 12px;
     padding: 10px 16px; color: var(--text); font-size: 13px; width: 320px;
     outline: none; transition: all 0.3s ease; font-weight: 500;
   }
-  .search-box::placeholder { color: #a5a5b8; }
+  .search-box::placeholder { color: #5a5a7a; }
   .search-box:focus {
     border-color: var(--accent);
     box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
@@ -257,10 +257,10 @@ _TEMPLATE = r"""<!DOCTYPE html>
   table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 12px; }
   th {
     text-align: left; padding: 10px 12px; font-weight: 700; color: var(--muted);
-    border-bottom: 2px solid rgba(99, 102, 241, 0.1); cursor: pointer;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.06); cursor: pointer;
     white-space: nowrap; user-select: none; font-size: 10px;
     text-transform: uppercase; letter-spacing: 0.8px;
-    background: rgba(248, 248, 255, 0.5);
+    background: rgba(255, 255, 255, 0.03);
   }
   th:first-child { border-radius: 10px 0 0 0; }
   th:last-child { border-radius: 0 10px 0 0; }
@@ -268,10 +268,10 @@ _TEMPLATE = r"""<!DOCTYPE html>
   th .arrow { font-size: 9px; margin-left: 3px; color: var(--accent); }
   td {
     padding: 10px 12px;
-    border-bottom: 1px solid rgba(99, 102, 241, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     white-space: nowrap;
   }
-  tr:hover td { background: rgba(99, 102, 241, 0.04); }
+  tr:hover td { background: rgba(129, 140, 248, 0.06); }
   .mono { font-family: 'SF Mono', 'Consolas', 'Monaco', monospace; font-size: 11px; }
   .addr-link {
     font-family: 'SF Mono', 'Consolas', 'Monaco', monospace; font-size: 11px;
@@ -289,13 +289,13 @@ _TEMPLATE = r"""<!DOCTYPE html>
     font-size: 10px; font-weight: 700; text-transform: capitalize;
     letter-spacing: 0.3px;
   }
-  .badge.heavy_seller { background: rgba(239, 68, 68, 0.1); color: var(--red); }
-  .badge.moderate_seller { background: rgba(245, 158, 11, 0.12); color: var(--amber); }
-  .badge.light_seller { background: rgba(59, 130, 246, 0.1); color: var(--blue); }
-  .badge.holder { background: rgba(16, 185, 129, 0.1); color: var(--green); }
+  .badge.heavy_seller { background: rgba(248, 113, 113, 0.15); color: var(--red); }
+  .badge.moderate_seller { background: rgba(251, 191, 36, 0.15); color: var(--amber); }
+  .badge.light_seller { background: rgba(96, 165, 250, 0.15); color: var(--blue); }
+  .badge.holder { background: rgba(52, 211, 153, 0.15); color: var(--green); }
 
   .sold-bar {
-    width: 80px; height: 6px; background: rgba(99, 102, 241, 0.08);
+    width: 80px; height: 6px; background: rgba(255, 255, 255, 0.08);
     border-radius: 3px; display: inline-block; vertical-align: middle;
     overflow: hidden;
   }
@@ -304,7 +304,7 @@ _TEMPLATE = r"""<!DOCTYPE html>
   .lbl {
     display: inline-block; padding: 2px 8px; border-radius: 6px;
     font-size: 9px; font-weight: 700;
-    background: linear-gradient(135deg, rgba(99,102,241,0.1), rgba(139,92,246,0.1));
+    background: rgba(167, 139, 250, 0.15);
     color: var(--violet); margin-left: 4px;
   }
 
@@ -315,13 +315,12 @@ _TEMPLATE = r"""<!DOCTYPE html>
   }
   .source-item {
     display: flex; gap: 16px; padding: 12px 0;
-    border-bottom: 1px solid rgba(99, 102, 241, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   }
   .source-item:last-child { border: none; }
   .source-name {
     font-weight: 700; min-width: 150px; font-size: 13px;
-    background: linear-gradient(135deg, var(--indigo), var(--violet));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    color: var(--accent);
   }
   .source-url {
     font-family: 'SF Mono', monospace; font-size: 11px; color: var(--muted);
@@ -442,7 +441,7 @@ kpis.forEach(k => {
 
 // ── Chart defaults ──
 Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif";
-Chart.defaults.color = '#6b7280';
+Chart.defaults.color = '#7a7a9a';
 
 // ── Behavior Doughnut ──
 const behLabels = Object.keys(DATA.behavior_counts).map(b => b.replace(/_/g,' ').replace(/\b\w/g, c => c.toUpperCase()));
@@ -453,7 +452,7 @@ new Chart(document.getElementById('behaviorChart'), {
   type: 'doughnut',
   data: {
     labels: behLabels,
-    datasets: [{ data: behValues, backgroundColor: behColors, borderWidth: 2, borderColor: '#fff', hoverOffset: 10 }]
+    datasets: [{ data: behValues, backgroundColor: behColors, borderWidth: 2, borderColor: '#1a1a2e', hoverOffset: 10 }]
   },
   options: {
     responsive: true,
