@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>XPL Token Unlock Tracker — January 2026 Research</title>
+<title>XPL Token Unlock Tracker — Real On-Chain Research</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <style>
   :root {
@@ -39,7 +39,6 @@
   }
   .header .sub { color: var(--muted); font-size: 14px; margin-top: 8px; }
   .header .sub a { color: var(--accent); text-decoration: none; }
-
   .card {
     background: var(--surface); border-radius: var(--radius);
     border: 1px solid var(--border); padding: 28px; margin-top: 24px;
@@ -54,8 +53,8 @@
     font-weight: 700; letter-spacing: 0.5px;
   }
   .tag-verified { background: rgba(52,211,153,0.15); color: var(--green); }
-  .tag-derived { background: rgba(251,191,36,0.15); color: var(--amber); }
-
+  .tag-onchain { background: rgba(96,165,250,0.15); color: var(--blue); }
+  .tag-investigation { background: rgba(248,113,113,0.15); color: var(--red); }
   .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-top: 24px; }
   .kpi { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; }
   .kpi .label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--muted); font-weight: 600; }
@@ -66,37 +65,32 @@
   .v-green { color: var(--green); }
   .v-amber { color: var(--amber); }
   .v-violet { color: var(--violet); }
-
   .charts { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 24px; }
   @media (max-width: 800px) { .charts { grid-template-columns: 1fr; } }
   .chart-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
   .chart-card h3 { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 16px; font-weight: 700; }
-
   table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 12px; }
   th { text-align: left; padding: 10px 12px; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; border-bottom: 2px solid rgba(255,255,255,0.06); font-weight: 700; }
   td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); }
   tr:hover td { background: rgba(129,140,248,0.04); }
   .mono { font-family: 'SF Mono','Consolas', monospace; font-size: 12px; }
   .num { text-align: right; font-variant-numeric: tabular-nums; font-family: 'SF Mono','Consolas', monospace; }
-
   .finding { padding: 16px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
   .finding:last-child { border: none; }
   .finding .title { font-weight: 700; font-size: 15px; margin-bottom: 4px; }
   .finding .body { color: #b0b0c8; font-size: 13.5px; line-height: 1.7; }
   .finding .source { font-size: 11px; color: var(--muted); margin-top: 6px; }
   .finding .source a { color: var(--accent); text-decoration: none; }
-
   .highlight { color: var(--accent); font-weight: 600; }
   .red { color: var(--red); }
   .green { color: var(--green); }
   .amber { color: var(--amber); }
-
-  .tools-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
-  @media (max-width: 600px) { .tools-grid { grid-template-columns: 1fr; } }
-  .tool-item { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
-  .tool-item .name { font-weight: 700; font-size: 14px; color: var(--accent); }
-  .tool-item .desc { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
-
+  a.addr { font-family: 'SF Mono','Consolas', monospace; font-size: 11px; color: var(--accent); text-decoration: none; word-break: break-all; }
+  a.addr:hover { color: var(--violet); text-decoration: underline; }
+  .wallet-card { background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-top: 12px; }
+  .wallet-card .wlabel { font-weight: 700; font-size: 14px; margin-bottom: 4px; }
+  .wallet-card .waddr { margin-bottom: 6px; }
+  .wallet-card .wdetail { font-size: 12.5px; color: #b0b0c8; line-height: 1.6; }
   .footer { text-align: center; color: var(--muted); font-size: 12px; margin-top: 40px; padding-top: 20px; border-top: 1px solid var(--border); }
 </style>
 </head>
@@ -105,54 +99,161 @@
 
 <div class="header">
   <h1>XPL Token Unlock Tracker</h1>
-  <div class="sub">January 2026 Ecosystem Unlock Analysis &mdash; Last updated March 5, 2026</div>
+  <div class="sub">On-Chain Research: Wallet Tracking, Selling Behavior & Unlock Impact &mdash; Updated March 12, 2026<br>
+  Dune: <a href="https://dune.com/seoul/plasma">dune.com/seoul/plasma</a></div>
 </div>
 
 <!-- KPIs -->
 <div class="kpis">
   <div class="kpi"><div class="label">Monthly Unlock</div><div class="value v-blue">88.89M</div><div class="note">XPL / month (Ecosystem)</div></div>
   <div class="kpi"><div class="label">Jan 25 Unlock Value</div><div class="value v-amber">~$14.7M</div><div class="note">at ~$0.166 XPL price</div></div>
-  <div class="kpi"><div class="label">Price (Jan 25)</div><div class="value" style="color:#e8e8f0">$0.166</div><div class="note">pre-unlock</div></div>
-  <div class="kpi"><div class="label">Price (Now)</div><div class="value v-green">$0.115</div><div class="note">Mar 5, 2026</div></div>
-  <div class="kpi"><div class="label">Drop Since Jan Unlock</div><div class="value v-red">-30.7%</div><div class="note">$0.166 &rarr; $0.115</div></div>
-  <div class="kpi"><div class="label">Circulating Supply</div><div class="value v-violet">2.23B</div><div class="note">of 10B total</div></div>
+  <div class="kpi"><div class="label">Ecosystem Sold at Launch</div><div class="value v-red">600M+</div><div class="note">XPL to CEXs via TWAP</div></div>
+  <div class="kpi"><div class="label">Price (Now)</div><div class="value v-green">$0.115</div><div class="note">-92% from ATH $1.52</div></div>
+  <div class="kpi"><div class="label">Big Whale Position</div><div class="value v-violet">54.09M</div><div class="note">XPL bought at $0.05</div></div>
+  <div class="kpi"><div class="label">Circulating</div><div class="value" style="color:var(--text)">2.23B</div><div class="note">of 10B total supply</div></div>
 </div>
 
-<!-- Tokenomics -->
+<!-- REAL WALLETS: The Big Whale -->
 <div class="card">
-  <h2>Token Allocation & Vesting Schedule <span class="tag tag-verified">Verified &mdash; Official Docs</span></h2>
-  <div class="charts" style="margin-top:0">
-    <div class="chart-card" style="background:transparent;border:none;padding:0">
-      <h3>Supply Allocation (10B Total)</h3>
-      <canvas id="allocChart"></canvas>
-    </div>
-    <div class="chart-card" style="background:transparent;border:none;padding:0">
-      <h3>Projected Circulating Supply Over Time</h3>
-      <canvas id="supplyChart"></canvas>
+  <h2>The Big Whale <span class="tag tag-onchain">On-Chain Verified &mdash; LookOnChain / PlasmaScan</span></h2>
+  <div class="wallet-card">
+    <div class="wlabel" style="color:var(--amber)">$50M Depositor &mdash; 54.09M XPL at $0.05</div>
+    <div class="waddr"><a class="addr" href="https://plasmascan.to/address/0x790c42D632502949e72Ab0981C2f0D2021141023" target="_blank">0x790c42D632502949e72Ab0981C2f0D2021141023</a></div>
+    <div class="wdetail">
+      Deposited <strong>$50M USDT</strong> into Plasma, received <strong>54.09M XPL</strong> at the $0.05 ICO price. At ATH ($1.52), this position was worth ~$82M &mdash; <span class="green">$47.7M in unrealized profits</span> from a single deposit. Also buys AAVE on Binance. Tracked by <strong>LookOnChain</strong>. <span class="amber">Status: Check PlasmaScan to see if still holding or has dumped.</span>
     </div>
   </div>
+</div>
+
+<!-- Unlock Distribution Addresses -->
+<div class="card">
+  <h2>January Unlock Distribution Addresses (~55M XPL) <span class="tag tag-onchain">PlasmaScan</span></h2>
+  <div class="wallet-card">
+    <div class="wlabel">Distribution Address 1</div>
+    <div class="waddr"><a class="addr" href="https://plasmascan.to/address/0x0e7b99b9b6b8d33ffc2a6adbe54a3746e4e2a97a" target="_blank">0x0e7b99b9b6b8d33ffc2a6adbe54a3746e4e2a97a</a></div>
+  </div>
+  <div class="wallet-card">
+    <div class="wlabel">Distribution Address 2</div>
+    <div class="waddr"><a class="addr" href="https://plasmascan.to/address/0xb329a587c2cbcaaed94ba65cad6b6dc81fa44095" target="_blank">0xb329a587c2cbcaaed94ba65cad6b6dc81fa44095</a></div>
+  </div>
+  <p style="color:var(--muted);font-size:12px;margin-top:12px;">These addresses received portions of the ~88.89M XPL monthly ecosystem unlock. Trace outbound transfers on PlasmaScan to see where the tokens went (exchanges, DeFi, or held).</p>
+</div>
+
+<!-- Exchange Hot Wallets -->
+<div class="card">
+  <h2>Exchange Hot Wallets <span class="tag tag-onchain">Inflows = Selling Pressure</span></h2>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Tokens flowing INTO these wallets represent sell pressure. Monitor XPL inflows around unlock dates to gauge how much of the unlocked supply hits the market.</p>
   <table>
-    <thead><tr><th>Allocation</th><th>%</th><th class="num">Tokens</th><th>Vesting</th><th>Status (Mar 2026)</th></tr></thead>
+    <thead><tr><th>Exchange</th><th>Address</th><th>XPL Balance / Volume</th><th>Notes</th></tr></thead>
     <tbody>
       <tr>
-        <td><strong>Ecosystem & Growth</strong></td><td>40%</td><td class="num">4,000,000,000</td>
-        <td>800M at launch + 88.89M/month for 36 months</td>
-        <td class="green">5 monthly unlocks completed (~1.24B unlocked)</td>
+        <td><strong>Binance Hot Wallet 20</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0xF977814e90dA44bFA03b6295A0616a897441aceC" target="_blank">0xF977814...1aceC</a></td>
+        <td class="num">~382M XPL + $370M USDT0</td>
+        <td>~$480M total on PlasmaScan. Main Binance sink.</td>
       </tr>
       <tr>
-        <td><strong>Team</strong></td><td>25%</td><td class="num">2,500,000,000</td>
-        <td>1-year cliff (Sep 25, 2026), then monthly over 2 years</td>
-        <td>Fully locked until Sep 2026</td>
+        <td><strong>Binance (main)</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0xf89d7b9c864f589bbf53a82105107622b35eaa40" target="_blank">0xf89d7b...eaa40</a></td>
+        <td class="num">-</td>
+        <td>Main Binance sink. 99M XPL hit this the day before TGE.</td>
       </tr>
       <tr>
-        <td><strong>Investors</strong></td><td>25%</td><td class="num">2,500,000,000</td>
-        <td>1-year cliff (Sep 25, 2026), then monthly over 2 years</td>
-        <td>Fully locked until Sep 2026</td>
+        <td><strong>Bybit Hot Wallet 1</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0xf89d7b9c864f589bbf53a82105107622b35eaa40" target="_blank">0xf89d7b...eaa40</a></td>
+        <td class="num">~$68M</td>
+        <td>335K+ txns on PlasmaScan</td>
       </tr>
       <tr>
-        <td><strong>Public Sale</strong></td><td>10%</td><td class="num">1,000,000,000</td>
-        <td>Non-US: unlocked at launch. US: locked until Jul 28, 2026</td>
-        <td class="amber">Non-US unlocked; US still locked</td>
+        <td><strong>BloFin Hot Wallet 1</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0x7Ff8bbf9C8AB106db589e7863fb100525F61CCe5" target="_blank">0x7Ff8bb...1CCe5</a></td>
+        <td class="num">~706K XPL</td>
+        <td></td>
+      </tr>
+      <tr>
+        <td><strong>Gate.io Deposit</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0x0d0707963952f2fba59dd06f2b425ace40b492fe" target="_blank">0x0d0707...492fe</a></td>
+        <td class="num">-</td>
+        <td>223K+ txns</td>
+      </tr>
+      <tr>
+        <td><strong>OKX Hot Wallet</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0x7c0629bbbaf7d68ffaa393e3fedc9b633679fa5f" target="_blank">0x7c0629...9fa5f</a></td>
+        <td class="num">-</td>
+        <td>Check PlasmaScan for current XPL balance</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Team Vault / Ecosystem Selling Investigation -->
+<div class="card">
+  <h2>Team Vault / Ecosystem Selling &mdash; The ManaMoon Investigation <span class="tag tag-investigation">On-Chain Investigation</span></h2>
+
+  <div class="finding">
+    <div class="title"><span class="red">600M+ XPL sent from team vault to exchanges via TWAP around launch</span></div>
+    <div class="body">
+      Independent analyst <strong>ManaMoon</strong> traced the Plasma team vault and found it sent <strong>600M+ XPL</strong> to centralized exchanges around the mainnet launch. Breakdown: ~250M to exchanges generally, ~120M to Bitfinex, ~260M to other CEXs. <strong>99M XPL hit Binance alone the day before TGE.</strong> The address is not publicly labeled but can be found by searching the "Plasma" entity on Arkham Intelligence.
+    </div>
+    <div class="source">Source: <a href="https://x.com/ManaMoonNFT/status/1973087081728503919">ManaMoonNFT on X</a>, <a href="https://en.cryptonomist.ch/2025/10/02/xpl-over-600m-from-the-vault-and-50-the-team-denies-sales-on-chain-under-scrutiny/">Cryptonomist</a></div>
+  </div>
+
+  <div class="finding">
+    <div class="title">Wintermute involvement &mdash; 25K-60K XPL batches flowing to CEXs</div>
+    <div class="body">
+      ManaMoon identified XPL flowing through <strong>Wintermute-linked addresses</strong> into CEXs in batches of 25K-60K tokens. Wintermute's market-making activity picked up on the second day after launch &mdash; <strong>the same day XPL topped out at $1.68</strong>. Plasma founder Paul Faecks denied engaging Wintermute: <em>"We have not engaged Wintermute as a market maker and have never contracted with Wintermute for any of their services."</em> However, on-chain data contradicts this claim. No single confirmed Wintermute address has been identified, but the pattern of TWAP-style batched sells is consistent.
+    </div>
+    <div class="source">Source: <a href="https://x.com/ManaMoonNFT/status/1973087081728503919">ManaMoonNFT</a>, <a href="https://cointelegraph.com/news/plasma-founder-denies-team-selling-after-xpl-dump">CoinTelegraph</a></div>
+  </div>
+
+  <div class="finding">
+    <div class="title">Team's defense: "Ecosystem & Growth" tokens, not "team" tokens</div>
+    <div class="body">
+      The team claims team and investor allocations are locked for 3 years with a 1-year cliff and that <em>no team tokens were sold</em>. However, community investigators noted this wording is careful &mdash; it doesn't address the <strong>800M Ecosystem & Growth tokens</strong> that were unlocked at launch. The 600M+ that went to exchanges came from the ecosystem allocation, not the locked team allocation. This is technically not "insider selling" of team tokens but is still the team-controlled ecosystem fund being sold into the market.
+    </div>
+    <div class="source">Source: <a href="https://coinmarketcap.com/academy/article/xpl-founder-rejects-insider-selling-claims-after-50percent-drop">CoinMarketCap</a>, <a href="https://bitcoinethereumnews.com/finance/plasma-clarifies-that-xpl-locked-tokens-have-not-been-sold/">Bitcoin Ethereum News</a></div>
+  </div>
+
+  <div class="finding">
+    <div class="title">Plasma Foundation ETH-side vault held $500M+ during ICO</div>
+    <div class="body">
+      Per Arkham Intelligence, the Plasma Foundation's Ethereum-side vault held <strong>$345.2M USDC + $146M USDT + $7.5M USDS + $1.2M DAI</strong> (~$500M total) during the ICO period. This gives context to the scale of the operation and the capital the team controls.
+    </div>
+    <div class="source">Source: Arkham Intelligence (search "Plasma" entity)</div>
+  </div>
+</div>
+
+<!-- DeFi / Infra Contracts -->
+<div class="card">
+  <h2>DeFi & Infrastructure Contracts <span class="tag tag-onchain">Not Sellers &mdash; Protocol Contracts</span></h2>
+  <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">These hold large XPL/token positions but are protocol contracts, not wallets that sell. Included for completeness when analyzing on-chain flows.</p>
+  <table>
+    <thead><tr><th>Contract</th><th>Address</th><th>Value / Activity</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Fluid Liquidity Layer</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0x52Aa899454998Be5b000Ad077a46Bbe360F4e497" target="_blank">0x52Aa89...4e497</a></td>
+        <td>~$409M in tokens</td>
+      </tr>
+      <tr>
+        <td><strong>Bridge / Infra Contract</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0x6131B5fae19EA4f9D964eAc0408E4408b66337b5" target="_blank">0x6131B5...337b5</a></td>
+        <td>305K txns</td>
+      </tr>
+      <tr>
+        <td><strong>LayerZero Endpoint V2</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0x6F475642a6e85809B1c36Fa62763669b1b48DD5B" target="_blank">0x6F4756...8DD5B</a></td>
+        <td>Cross-chain messaging</td>
+      </tr>
+      <tr>
+        <td><strong>USDT Contract (Mirror)</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0xdAC17F958D2ee523a2206206994597C13D831ec7" target="_blank">0xdAC17F...31ec7</a></td>
+        <td>$4M multichain</td>
+      </tr>
+      <tr>
+        <td><strong>Unverified (holds XPLT)</strong></td>
+        <td><a class="addr" href="https://plasmascan.to/address/0xde7259893af7cdbc9fd806c6ba61d22d581d5667" target="_blank">0xde7259...d5667</a></td>
+        <td>Holds XPLT tokens</td>
       </tr>
     </tbody>
   </table>
@@ -160,23 +261,42 @@
 
 <!-- Unlock Timeline -->
 <div class="card">
-  <h2>Ecosystem Unlock Timeline <span class="tag tag-verified">Verified &mdash; Tokenomist / Official Docs</span></h2>
-  <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">88,888,889 XPL released on the 25th of each month from the Ecosystem & Growth allocation. These are the only active unlocks until the Team/Investor cliff in September 2026.</p>
+  <h2>Ecosystem Unlock Timeline <span class="tag tag-verified">Verified &mdash; Tokenomist</span></h2>
   <table>
-    <thead><tr><th>Date</th><th class="num">XPL Unlocked</th><th class="num">~USD Value</th><th>XPL Price</th><th>% of Circ. Supply</th><th>Market Reaction</th></tr></thead>
+    <thead><tr><th>Date</th><th class="num">XPL Unlocked</th><th class="num">~USD Value</th><th>XPL Price</th><th>Market Reaction</th></tr></thead>
     <tbody>
-      <tr><td class="mono">Oct 25, 2025</td><td class="num">88,888,889</td><td class="num">~$80M</td><td>~$0.90</td><td>~4.7%</td><td class="red">Part of 84% post-launch decline</td></tr>
-      <tr><td class="mono">Nov 25, 2025</td><td class="num">88,888,889</td><td class="num">~$35M</td><td>~$0.39</td><td>~4.5%</td><td class="red">Continued downtrend</td></tr>
-      <tr><td class="mono">Dec 25, 2025</td><td class="num">88,888,889</td><td class="num">~$22M</td><td>~$0.25</td><td>~4.3%</td><td style="color:var(--muted)">Stabilizing</td></tr>
-      <tr style="background:rgba(129,140,248,0.06)"><td class="mono"><strong>Jan 25, 2026</strong></td><td class="num"><strong>88,888,889</strong></td><td class="num"><strong>~$14.7M</strong></td><td><strong>~$0.166</strong></td><td><strong>~4.2%</strong></td><td class="red">Dropped to $0.08 by Feb 24</td></tr>
-      <tr><td class="mono">Feb 25, 2026</td><td class="num">88,888,889</td><td class="num">~$8.2M</td><td>~$0.092</td><td>~4.0%</td><td class="green">+18% surge, market absorbed supply</td></tr>
-      <tr><td class="mono">Mar 25, 2026</td><td class="num">88,888,889</td><td class="num">~$8.8M*</td><td>$0.115*</td><td>~3.8%</td><td style="color:var(--muted)">Upcoming</td></tr>
+      <tr><td class="mono">Sep 25, 2025</td><td class="num">800,000,000</td><td class="num">~$584M</td><td>$0.73</td><td class="amber">Launch day &mdash; 600M+ went to CEXs via TWAP</td></tr>
+      <tr><td class="mono">Oct 25, 2025</td><td class="num">88,888,889</td><td class="num">~$80M</td><td>~$0.90</td><td class="red">Start of 84% post-launch decline</td></tr>
+      <tr><td class="mono">Nov 25, 2025</td><td class="num">88,888,889</td><td class="num">~$35M</td><td>~$0.39</td><td class="red">Continued downtrend</td></tr>
+      <tr><td class="mono">Dec 25, 2025</td><td class="num">88,888,889</td><td class="num">~$22M</td><td>~$0.25</td><td style="color:var(--muted)">Stabilizing</td></tr>
+      <tr style="background:rgba(129,140,248,0.06)"><td class="mono"><strong>Jan 25, 2026</strong></td><td class="num"><strong>88,888,889</strong></td><td class="num"><strong>~$14.7M</strong></td><td><strong>$0.166</strong></td><td class="red">Dropped to $0.08 by Feb 24</td></tr>
+      <tr><td class="mono">Feb 25, 2026</td><td class="num">88,888,889</td><td class="num">~$8.2M</td><td>$0.092</td><td class="green">+18% surge, $822K net outflow from CEXs</td></tr>
+      <tr><td class="mono">Mar 25, 2026</td><td class="num">88,888,889</td><td class="num">~$10.2M*</td><td>$0.115*</td><td style="color:var(--muted)">Upcoming</td></tr>
     </tbody>
   </table>
-  <p style="color:var(--muted);font-size:11px;margin-top:8px;">* Projected at current price. Sources: <a href="https://tokenomist.ai/plasma" style="color:var(--accent);text-decoration:none">Tokenomist</a>, <a href="https://www.coingecko.com/en/coins/plasma" style="color:var(--accent);text-decoration:none">CoinGecko</a>, <a href="https://coinmarketcap.com/currencies/plasma-xpl/" style="color:var(--accent);text-decoration:none">CoinMarketCap</a></p>
 </div>
 
-<!-- Price Impact Chart -->
+<!-- Feb 25 Unlock Analysis -->
+<div class="card">
+  <h2>Feb 25 Unlock: First Time Market Absorbed the Supply <span class="tag tag-verified">Verified</span></h2>
+  <div class="finding">
+    <div class="title"><span class="green">Net outflow of $822K FROM exchanges &mdash; people were withdrawing, not depositing</span></div>
+    <div class="body">
+      The February 25 unlock (88.89M XPL, ~$8.2M) was the first monthly unlock that didn't cause a dump. Key signals:
+      <ul style="margin:8px 0 0 20px;color:#b0b0c8">
+        <li><span class="green">$822K net outflow</span> from exchanges &mdash; holders withdrew rather than deposited</li>
+        <li><strong>73% of Binance top traders were long</strong></li>
+        <li>Price <span class="green">pumped 18%</span> in 24 hours despite the unlock</li>
+        <li>Whoever received the Feb tokens <strong>held or staked &mdash; didn't dump</strong></li>
+        <li>This was the first time this happened since launch</li>
+      </ul>
+      This is significant because every prior unlock was met with selling. The shift could indicate: (a) the ecosystem fund already sold most of what they intended, (b) the price is low enough that selling pressure is exhausted, or (c) the tokens were deployed to DeFi/staking instead of sold.
+    </div>
+    <div class="source">Source: <a href="https://coinmarketcap.com/cmc-ai/plasma-xpl/latest-updates/">CoinMarketCap</a></div>
+  </div>
+</div>
+
+<!-- Price Impact Charts -->
 <div class="charts">
   <div class="chart-card">
     <h3>XPL Price Around Unlock Dates (USD)</h3>
@@ -188,135 +308,84 @@
   </div>
 </div>
 
-<!-- Key Findings -->
+<!-- Tokenomics -->
 <div class="card">
-  <h2>Research Findings &mdash; January 2026 Unlock <span class="tag tag-derived">Derived from public data</span></h2>
-
-  <div class="finding">
-    <div class="title">88.89M XPL unlocked Jan 25 at 12:00 UTC from Ecosystem & Growth</div>
-    <div class="body">
-      The January ecosystem unlock released 88,888,889 XPL (~$14.7M at the time) into circulation. This was the 4th monthly ecosystem unlock since mainnet launch. The tokens go to the Ecosystem & Growth wallet controlled by the Plasma team, designated for liquidity incentives, DeFi partnerships, exchange integrations, and adoption programs.
+  <h2>Token Allocation & Vesting <span class="tag tag-verified">Official Docs</span></h2>
+  <div class="charts" style="margin-top:0">
+    <div class="chart-card" style="background:transparent;border:none;padding:0">
+      <h3>Supply Allocation (10B Total)</h3>
+      <canvas id="allocChart"></canvas>
     </div>
-    <div class="source">Source: <a href="https://tokenomist.ai/plasma">Tokenomist</a>, <a href="https://www.plasma.to/docs/get-started/xpl/tokenomics">Plasma Official Docs</a></div>
-  </div>
-
-  <div class="finding">
-    <div class="title">Price dropped <span class="red">~52%</span> from Jan 25 ($0.166) to Feb 24 low ($0.08)</div>
-    <div class="body">
-      In the 30 days following the January unlock, XPL experienced severe selling pressure. The price fell from ~$0.166 on unlock day to test the <span class="red">$0.08 demand zone</span> on February 24, with bearish momentum pushing XPL down 12% in a single day. Futures traders were "extremely pessimistic" according to CoinMarketCap analysis. This suggests the unlocked tokens — or broader market dynamics around them — contributed significant sell pressure.
+    <div class="chart-card" style="background:transparent;border:none;padding:0">
+      <h3>Projected Circulating Supply</h3>
+      <canvas id="supplyChart"></canvas>
     </div>
-    <div class="source">Source: <a href="https://coinmarketcap.com/cmc-ai/plasma-xpl/latest-updates/">CoinMarketCap AI Insights</a></div>
   </div>
-
-  <div class="finding">
-    <div class="title">Feb 25 unlock was <span class="green">absorbed</span> &mdash; price surged 18% after</div>
-    <div class="body">
-      The February 25 unlock (another 88.89M XPL, ~$8.2M) saw a dramatically different reaction. XPL surged 18% in 24 hours. Net outflow of <span class="green">~$822,130 from exchanges</span> indicated holders were NOT rushing to sell. The lower dollar value of the unlock (~$8.2M vs $14.7M in Jan) and the already-depressed price may have reduced sell pressure. This could indicate the worst of the post-unlock selling from earlier months has subsided.
-    </div>
-    <div class="source">Source: <a href="https://coinmarketcap.com/cmc-ai/plasma-xpl/latest-updates/">CoinMarketCap AI Insights</a>, <a href="https://www.coingecko.com/en/coins/plasma">CoinGecko</a></div>
-  </div>
-
-  <div class="finding">
-    <div class="title">Whale activity: $47.7M unrealized profits from $50M USDT deposit</div>
-    <div class="body">
-      Large depositors (whales) generated <span class="highlight">$47.7M in unrealized profits</span> from a $50M USDT deposit into the Plasma ecosystem. This activity predates the January unlock and shows that significant capital was already positioned in the ecosystem. These large holders are a key variable — if they unwind positions, it would add to sell pressure beyond just the unlock tokens.
-    </div>
-    <div class="source">Source: <a href="https://www.ainvest.com/news/plasma-xpl-soars-stablecoin-momentum-2026-unlocks-loom-2509/">ainvest.com</a></div>
-  </div>
-
-  <div class="finding">
-    <div class="title">Only Ecosystem unlocks are active &mdash; <span class="amber">massive cliff event in Sep 2026</span></div>
-    <div class="body">
-      Currently, only the Ecosystem & Growth allocation unlocks monthly (~88.89M XPL). Team and Investor tokens (50% of total supply = <span class="red">5 billion XPL</span>) are fully locked with a 1-year cliff hitting <strong>September 25, 2026</strong>. On that date, ~1/3 of each allocation unlocks at once (~833M team + ~833M investor = <span class="red">~1.67 billion XPL</span>). This is the single largest upcoming supply event. After the cliff, another ~138.8M XPL/month unlocks from team + investors + ecosystem combined. Additionally, US public sale participants unlock on <strong>July 28, 2026</strong>.
-    </div>
-    <div class="source">Source: <a href="https://www.plasma.to/docs/get-started/xpl/tokenomics">Plasma Official Docs</a></div>
-  </div>
-
-  <div class="finding">
-    <div class="title">DeFi ecosystem: $7B+ stablecoins, 100+ protocols, but yields attract mercenary capital</div>
-    <div class="body">
-      Plasma launched with $2B in stablecoins across 100+ DeFi partners (Aave, Ethena, Fluid, Euler) and surpassed $7B stablecoin supply by Sep 28, 2025. Aave's Plasma market saw ~$1.5B in daily deposits. However, <span class="amber">Sentora flagged whale concentration risk</span> on Aave v3 Plasma — a few large wallets hold outsized positions. 10% yields on USDT farms attract capital, but this is often mercenary — it leaves when yields drop, adding to sell pressure on XPL.
-    </div>
-    <div class="source">Source: <a href="https://blockworks.co/news/plasma-announces-mainnet-beta">Blockworks</a>, <a href="https://thedefiant.io/news/blockchains/plasma-mainnet-beta-xpl-token-launch">The Defiant</a></div>
-  </div>
-
-  <div class="finding">
-    <div class="title">Current state: $0.115 (Mar 5) &mdash; <span class="red">92% below ATH</span>, ~40K daily USDT txs</div>
-    <div class="body">
-      XPL trades at $0.115 with a $257M market cap and $159M 24h volume. It's 92% below its ATH of $1.52 (Sep 29, 2025). The network processes ~40,000 daily USDT transactions — watch this metric as an indicator of real network utility vs speculative farming. The recent 27% weekly gain suggests a potential bottom may be forming, but the March 25 unlock and larger events ahead remain risks.
-    </div>
-    <div class="source">Source: <a href="https://www.coingecko.com/en/coins/plasma">CoinGecko</a>, <a href="https://coinmarketcap.com/currencies/plasma-xpl/">CoinMarketCap</a></div>
-  </div>
+  <table>
+    <thead><tr><th>Allocation</th><th>%</th><th class="num">Tokens</th><th>Vesting</th><th>Status</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><strong>Ecosystem & Growth</strong></td><td>40%</td><td class="num">4,000,000,000</td>
+        <td>800M at launch + 88.89M/month for 36 months</td>
+        <td class="amber">600M+ already sold to CEXs at launch. Monthly unlocks ongoing.</td>
+      </tr>
+      <tr>
+        <td><strong>Team</strong></td><td>25%</td><td class="num">2,500,000,000</td>
+        <td>1-year cliff (Sep 25, 2026), then 2 years monthly</td>
+        <td>Fully locked until Sep 2026</td>
+      </tr>
+      <tr>
+        <td><strong>Investors</strong></td><td>25%</td><td class="num">2,500,000,000</td>
+        <td>1-year cliff (Sep 25, 2026), then 2 years monthly</td>
+        <td>Fully locked until Sep 2026</td>
+      </tr>
+      <tr>
+        <td><strong>Public Sale</strong></td><td>10%</td><td class="num">1,000,000,000</td>
+        <td>Non-US: at launch. US: Jul 28, 2026</td>
+        <td class="amber">US unlock coming Jul 28</td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 
 <!-- Upcoming Events -->
 <div class="card">
   <h2>Upcoming Supply Events <span class="tag tag-verified">Verified</span></h2>
   <table>
-    <thead><tr><th>Date</th><th>Event</th><th class="num">XPL Amount</th><th>Impact</th></tr></thead>
+    <thead><tr><th>Date</th><th>Event</th><th class="num">XPL Amount</th><th>Risk Level</th></tr></thead>
     <tbody>
-      <tr><td class="mono">Mar 25, 2026</td><td>Ecosystem monthly unlock</td><td class="num">88,888,889</td><td class="amber">~$8.8M at current price</td></tr>
-      <tr><td class="mono">Apr 25, 2026</td><td>Ecosystem monthly unlock</td><td class="num">88,888,889</td><td style="color:var(--muted)">Recurring monthly</td></tr>
-      <tr><td class="mono">Jul 28, 2026</td><td style="color:var(--amber)"><strong>US Public Sale unlock</strong></td><td class="num">Unknown portion of 1B</td><td class="red">Potentially large — 12-month lockup ends</td></tr>
-      <tr style="background:rgba(248,113,113,0.06)"><td class="mono">Sep 25, 2026</td><td style="color:var(--red)"><strong>Team + Investor cliff</strong></td><td class="num">~1,670,000,000</td><td class="red">~1.67B XPL unlocks at once (16.7% of supply)</td></tr>
-      <tr><td class="mono">Oct 2026+</td><td>Team + Investor + Ecosystem monthly</td><td class="num">~227,000,000/mo</td><td class="red">~$22.7M/mo at current price</td></tr>
+      <tr><td class="mono">Mar 25, 2026</td><td>Ecosystem monthly unlock</td><td class="num">88,888,889</td><td class="amber">Medium &mdash; watch if Feb pattern holds</td></tr>
+      <tr><td class="mono">Jul 28, 2026</td><td style="color:var(--amber)"><strong>US Public Sale unlock</strong></td><td class="num">Up to ~1B</td><td class="red">High &mdash; 12-month lockup ends for US buyers</td></tr>
+      <tr style="background:rgba(248,113,113,0.06)"><td class="mono">Sep 25, 2026</td><td style="color:var(--red)"><strong>Team + Investor cliff</strong></td><td class="num">~1,670,000,000</td><td class="red">Extreme &mdash; 16.7% of total supply at once</td></tr>
+      <tr><td class="mono">Oct 2026+</td><td>All allocations monthly</td><td class="num">~227M/month</td><td class="red">High &mdash; sustained monthly pressure</td></tr>
     </tbody>
   </table>
-</div>
-
-<!-- On-Chain Tracking Tools -->
-<div class="card">
-  <h2>How to Track On-Chain (Wallet-Level Analysis)</h2>
-  <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">To identify specific wallet addresses receiving unlock tokens and their selling behavior, use these tools directly. Plasma is EVM-compatible (Chain ID 9745), so standard Ethereum tooling works.</p>
-  <div class="tools-grid">
-    <div class="tool-item">
-      <div class="name">PlasmaScan</div>
-      <div class="desc">Block explorer for Plasma. View top token holders at the XPL contract page, trace distribution transactions from vesting contracts, and monitor individual wallet activity.</div>
-    </div>
-    <div class="tool-item">
-      <div class="name">Arkham Intelligence</div>
-      <div class="desc">Has confirmed Plasma chain integration. Entity labels map wallets to Plasma Foundation, Ecosystem Fund, known investors. Search "Plasma" to find labeled addresses and track their transfers.</div>
-    </div>
-    <div class="tool-item">
-      <div class="name">Nansen</div>
-      <div class="desc">Smart Money tracking across 30+ chains. Use Token God Mode for XPL to see smart money holders, balance shifts, and exchange flow signals. Watch for net exchange inflows as sell pressure indicator.</div>
-    </div>
-    <div class="tool-item">
-      <div class="name">Tokenomist (formerly TokenUnlocks)</div>
-      <div class="desc">Tracks the exact unlock schedule, historical unlock events, and projected future releases. Confirms 88.89M XPL monthly ecosystem unlocks and shows upcoming events.</div>
-    </div>
-    <div class="tool-item">
-      <div class="name">Messari</div>
-      <div class="desc">Fundamental research and data on XPL including tokenomics, governance, team info, and investor details. Use for cross-referencing allocation data and tracking project developments.</div>
-    </div>
-    <div class="tool-item">
-      <div class="name">DefiLlama</div>
-      <div class="desc">Track Plasma's TVL across all DeFi protocols. Watch for TVL drops that could signal capital flight. Plasma is ranked by stablecoin market cap — monitor stablecoin supply health.</div>
-    </div>
-  </div>
-  <p style="color:var(--muted);font-size:12px;margin-top:14px;"><strong>XPL Token Contract:</strong> <span class="mono" style="color:var(--accent)">0x405fbc9004d857903bfd6b3357792d71a50726b0</span> &nbsp;|&nbsp; <strong>Chain ID:</strong> 9745 &nbsp;|&nbsp; <strong>RPC:</strong> <span class="mono">https://rpc.plasma.to</span></p>
 </div>
 
 <!-- Sources -->
 <div class="card">
-  <h2>Sources</h2>
+  <h2>Sources & Tools</h2>
   <table style="font-size:12px">
-    <thead><tr><th>Source</th><th>Data Used</th><th>Verification</th></tr></thead>
+    <thead><tr><th>Source</th><th>Data</th></tr></thead>
     <tbody>
-      <tr><td><a href="https://www.plasma.to/docs/get-started/xpl/tokenomics" style="color:var(--accent);text-decoration:none">Plasma Official Docs</a></td><td>Tokenomics, allocations, vesting schedule</td><td class="green">Primary source</td></tr>
-      <tr><td><a href="https://tokenomist.ai/plasma" style="color:var(--accent);text-decoration:none">Tokenomist</a></td><td>Unlock dates, amounts, schedule confirmation</td><td class="green">Cross-verified</td></tr>
-      <tr><td><a href="https://www.coingecko.com/en/coins/plasma" style="color:var(--accent);text-decoration:none">CoinGecko</a></td><td>Price data, market cap, volume, ATH</td><td class="green">Primary source</td></tr>
-      <tr><td><a href="https://coinmarketcap.com/currencies/plasma-xpl/" style="color:var(--accent);text-decoration:none">CoinMarketCap</a></td><td>Price data, circulating supply, AI insights</td><td class="green">Cross-verified</td></tr>
-      <tr><td><a href="https://blockworks.co/news/plasma-announces-mainnet-beta" style="color:var(--accent);text-decoration:none">Blockworks</a></td><td>Launch data, DeFi ecosystem, stablecoin TVL</td><td class="green">News reporting</td></tr>
-      <tr><td><a href="https://thedefiant.io/news/blockchains/plasma-mainnet-beta-xpl-token-launch" style="color:var(--accent);text-decoration:none">The Defiant</a></td><td>Launch metrics, FDV, ecosystem partners</td><td class="green">News reporting</td></tr>
-      <tr><td><a href="https://www.ainvest.com/news/plasma-xpl-soars-stablecoin-momentum-2026-unlocks-loom-2509/" style="color:var(--accent);text-decoration:none">ainvest</a></td><td>Whale activity, unrealized profits data</td><td class="amber">Single source</td></tr>
+      <tr><td><a href="https://dune.com/seoul/plasma" style="color:var(--accent);text-decoration:none">Dune Analytics (seoul/plasma)</a></td><td>Dashboard with on-chain Plasma analytics</td></tr>
+      <tr><td><a href="https://x.com/ManaMoonNFT/status/1973087081728503919" style="color:var(--accent);text-decoration:none">ManaMoonNFT Investigation</a></td><td>Team vault tracing, 600M+ XPL to CEXs, Wintermute flow analysis</td></tr>
+      <tr><td><a href="https://plasmascan.to" style="color:var(--accent);text-decoration:none">PlasmaScan</a></td><td>Block explorer &mdash; all wallet addresses verified here</td></tr>
+      <tr><td><a href="https://intel.arkm.com" style="color:var(--accent);text-decoration:none">Arkham Intelligence</a></td><td>Entity labels &mdash; search "Plasma" for foundation/team vault addresses</td></tr>
+      <tr><td><a href="https://www.plasma.to/docs/get-started/xpl/tokenomics" style="color:var(--accent);text-decoration:none">Plasma Official Docs</a></td><td>Tokenomics, allocations, vesting schedule</td></tr>
+      <tr><td><a href="https://tokenomist.ai/plasma" style="color:var(--accent);text-decoration:none">Tokenomist</a></td><td>Unlock schedule, dates, amounts</td></tr>
+      <tr><td><a href="https://www.coingecko.com/en/coins/plasma" style="color:var(--accent);text-decoration:none">CoinGecko</a></td><td>Price data, market cap, volume</td></tr>
+      <tr><td><a href="https://cointelegraph.com/news/plasma-founder-denies-team-selling-after-xpl-dump" style="color:var(--accent);text-decoration:none">CoinTelegraph</a></td><td>Insider selling controversy, founder denial</td></tr>
+      <tr><td><a href="https://en.cryptonomist.ch/2025/10/02/xpl-over-600m-from-the-vault-and-50-the-team-denies-sales-on-chain-under-scrutiny/" style="color:var(--accent);text-decoration:none">Cryptonomist</a></td><td>600M vault outflow details, on-chain scrutiny</td></tr>
+      <tr><td>LookOnChain</td><td>Whale tracking &mdash; $50M depositor / 54.09M XPL position</td></tr>
     </tbody>
   </table>
+  <p style="color:var(--muted);font-size:12px;margin-top:14px;"><strong>XPL Contract:</strong> <span class="mono" style="color:var(--accent)">0x405fbc9004d857903bfd6b3357792d71a50726b0</span> &nbsp;|&nbsp; <strong>Chain ID:</strong> 9745 &nbsp;|&nbsp; <strong>RPC:</strong> <span class="mono">https://rpc.plasma.to</span></p>
 </div>
 
 <div class="footer">
-  XPL Token Unlock Tracker &mdash; Research compiled March 5, 2026 &mdash; All data from public sources, no synthetic data<br>
-  Built with Plasma RPC (Chain ID 9745) + PlasmaScan API + Arkham Intelligence integration
+  XPL Token Unlock Tracker &mdash; All data from public on-chain sources, no synthetic data<br>
+  Wallet addresses verified on PlasmaScan &mdash; Investigation data from ManaMoonNFT, Arkham, LookOnChain
 </div>
 
 </div>
@@ -343,15 +412,13 @@ new Chart(document.getElementById('allocChart'), {
 });
 
 // Circulating Supply Over Time
-const supplyLabels = ['Launch\nSep 25', 'Oct 25', 'Nov 25', 'Dec 25', 'Jan 25', 'Feb 25', 'Mar 25*', 'Jul 28*', 'Sep 25*'];
-const circSupply = [1800, 1889, 1978, 2067, 2156, 2244, 2333, 2333, 4003]; // in millions, Jul doesn't add ecosystem, Sep adds cliff
 new Chart(document.getElementById('supplyChart'), {
   type: 'line',
   data: {
-    labels: supplyLabels,
+    labels: ['Launch\nSep 25', 'Oct 25', 'Nov 25', 'Dec 25', 'Jan 25', 'Feb 25', 'Mar 25*', 'Jul 28*', 'Sep 25*'],
     datasets: [{
       label: 'Circulating Supply (M XPL)',
-      data: circSupply,
+      data: [1800, 1889, 1978, 2067, 2156, 2244, 2333, 2333, 4003],
       borderColor: '#818cf8', backgroundColor: 'rgba(129,140,248,0.1)',
       fill: true, tension: 0.3, pointRadius: 5, pointBackgroundColor: '#818cf8',
     }]
@@ -362,26 +429,21 @@ new Chart(document.getElementById('supplyChart'), {
       y: { ticks: { color: '#7a7a9a', callback: v => v >= 1000 ? (v/1000).toFixed(1)+'B' : v+'M' }, grid: { color: 'rgba(255,255,255,0.04)' } },
       x: { ticks: { color: '#7a7a9a', font: { size: 10 } }, grid: { display: false } }
     },
-    plugins: {
-      legend: { display: false },
-      tooltip: { callbacks: { label: ctx => (ctx.raw >= 1000 ? (ctx.raw/1000).toFixed(2)+'B' : ctx.raw+'M') + ' XPL' } }
-    }
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => (ctx.raw >= 1000 ? (ctx.raw/1000).toFixed(2)+'B' : ctx.raw+'M') + ' XPL' } } }
   }
 });
 
 // Price around unlock dates
-const priceLabels = ['Sep 25\nLaunch', 'Sep 29\nATH', 'Oct 25\nUnlock', 'Nov 25\nUnlock', 'Dec 25\nUnlock', 'Jan 25\nUnlock', 'Feb 6\nLow', 'Feb 24\nLow', 'Feb 25\nUnlock', 'Feb 27\n+18%', 'Mar 5\nNow'];
-const priceData = [0.73, 1.52, 0.90, 0.39, 0.25, 0.166, 0.073, 0.08, 0.092, 0.109, 0.115];
 new Chart(document.getElementById('priceChart'), {
   type: 'line',
   data: {
-    labels: priceLabels,
+    labels: ['Sep 25\nLaunch', 'Sep 29\nATH', 'Oct 25\nUnlock', 'Nov 25\nUnlock', 'Dec 25\nUnlock', 'Jan 25\nUnlock', 'Feb 6\nATL', 'Feb 24\nLow', 'Feb 25\nUnlock', 'Feb 27\n+18%', 'Mar 12\nNow'],
     datasets: [{
       label: 'XPL Price (USD)',
-      data: priceData,
+      data: [0.73, 1.52, 0.90, 0.39, 0.25, 0.166, 0.073, 0.08, 0.092, 0.109, 0.115],
       borderColor: '#f87171', backgroundColor: 'rgba(248,113,113,0.08)',
       fill: true, tension: 0.3, pointRadius: 6,
-      pointBackgroundColor: priceData.map((p,i) => [2,5,8].includes(i) ? '#fbbf24' : (i === priceLabels.length-1 ? '#34d399' : '#f87171')),
+      pointBackgroundColor: [0.73, 1.52, 0.90, 0.39, 0.25, 0.166, 0.073, 0.08, 0.092, 0.109, 0.115].map((p,i) => [2,3,4,5].includes(i) ? '#fbbf24' : (i === 10 ? '#34d399' : (i === 1 ? '#34d399' : '#f87171'))),
     }]
   },
   options: {
@@ -390,37 +452,26 @@ new Chart(document.getElementById('priceChart'), {
       y: { ticks: { color: '#7a7a9a', callback: v => '$'+v.toFixed(2) }, grid: { color: 'rgba(255,255,255,0.04)' } },
       x: { ticks: { color: '#7a7a9a', font: { size: 9 } }, grid: { display: false } }
     },
-    plugins: {
-      legend: { display: false },
-      tooltip: { callbacks: { label: ctx => '$' + ctx.raw.toFixed(3) } }
-    }
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => '$' + ctx.raw.toFixed(3) } } }
   }
 });
 
 // Unlock value chart
-const unlockMonths = ['Oct 25', 'Nov 25', 'Dec 25', 'Jan 25', 'Feb 25', 'Mar 25*'];
-const unlockValues = [80, 35, 22, 14.7, 8.2, 8.8]; // USD millions
-const unlockPctMcap = [4.7, 4.5, 4.3, 4.2, 4.9, 3.8]; // % of market cap
 new Chart(document.getElementById('unlockValueChart'), {
   type: 'bar',
   data: {
-    labels: unlockMonths,
+    labels: ['Launch\n800M', 'Oct 25', 'Nov 25', 'Dec 25', 'Jan 25', 'Feb 25', 'Mar 25*'],
     datasets: [
-      { label: 'Unlock Value ($M)', data: unlockValues, backgroundColor: '#818cf8', borderRadius: 6, yAxisID: 'y' },
-      { label: '% of Market Cap', data: unlockPctMcap, type: 'line', borderColor: '#fbbf24', pointBackgroundColor: '#fbbf24', pointRadius: 5, yAxisID: 'y1', tension: 0.3 },
+      { label: 'Unlock Value ($M)', data: [584, 80, 35, 22, 14.7, 8.2, 10.2], backgroundColor: ['#f87171','#818cf8','#818cf8','#818cf8','#818cf8','#34d399','#7a7a9a'], borderRadius: 6, yAxisID: 'y' },
     ]
   },
   options: {
     responsive: true,
     scales: {
-      y: { position: 'left', ticks: { color: '#7a7a9a', callback: v => '$'+v+'M' }, grid: { color: 'rgba(255,255,255,0.04)' } },
-      y1: { position: 'right', ticks: { color: '#fbbf24', callback: v => v+'%' }, grid: { display: false }, min: 0, max: 10 },
-      x: { ticks: { color: '#7a7a9a' }, grid: { display: false } }
+      y: { ticks: { color: '#7a7a9a', callback: v => '$'+v+'M' }, grid: { color: 'rgba(255,255,255,0.04)' } },
+      x: { ticks: { color: '#7a7a9a', font: { size: 10 } }, grid: { display: false } }
     },
-    plugins: {
-      legend: { labels: { color: '#b0b0c8', padding: 16, font: { size: 11 }, usePointStyle: true } },
-      tooltip: { callbacks: { label: ctx => ctx.dataset.yAxisID === 'y1' ? ctx.raw+'% of mcap' : '$'+ctx.raw+'M' } }
-    }
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => '$'+ctx.raw+'M' } } }
   }
 });
 </script>
